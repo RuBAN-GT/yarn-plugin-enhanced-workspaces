@@ -1,8 +1,9 @@
 import { CommandContext, Project } from '@yarnpkg/core';
-import { Command, Usage } from 'clipanion';
+import { Command, Usage, UsageError } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
 
 import { VersionManager } from '../../../core/version-manager';
+import { WORKSPACE_PLUGIN_NAME } from './foreach.consts';
 
 export class ForeachCommand extends Command<CommandContext> {
   // Params
@@ -24,7 +25,7 @@ export class ForeachCommand extends Command<CommandContext> {
   // Meta
   public static usage: Usage = Command.Usage({
     category: 'Workspace-related commands',
-    description: 'A wrapper over foreach with -it options helping to invoke operations for changed workspaces.',
+    description: `A wrapper over foreach with -it options helping to invoke operations for changed workspaces. Required to have installed ${WORKSPACE_PLUGIN_NAME} plugin.`,
   });
 
   // Dependencies
@@ -33,12 +34,14 @@ export class ForeachCommand extends Command<CommandContext> {
   // Commands
   @Command.Path('workspaces', 'changed', 'foreach')
   public async execute(): Promise<void> {
-    const configuration = await Configuration.find(this.context.cwd, this.context.plugins);
-    const { project } = await Project.find(configuration, this.context.cwd);
+    const config = await Configuration.find(this.context.cwd, this.context.plugins);
+    const { project } = await Project.find(config, this.context.cwd);
+
+    this.validate(config);
 
     const affectedList: string[] = await this.getAffectedList(project);
     if (affectedList.length === 0) {
-      console.dir('No affected workspaces');
+      console.dir('No affected workspaces.');
       return;
     }
 
@@ -65,5 +68,11 @@ export class ForeachCommand extends Command<CommandContext> {
     });
 
     return affectedList;
+  }
+
+  private validate(config: Configuration): void {
+    if (!config.plugins.has(WORKSPACE_PLUGIN_NAME)) {
+      throw new UsageError(`You should install ${WORKSPACE_PLUGIN_NAME} plugin to use this command.`);
+    }
   }
 }

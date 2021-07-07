@@ -26,6 +26,10 @@ export class ListCommand extends Command<CommandContext> {
     const { project } = await Project.find(configuration, this.context.cwd);
 
     const affectedNodes = await this.versionManager.findCandidates(project);
+    if (affectedNodes.size === 0) {
+      console.dir('No affected workspaces.');
+      return;
+    }
 
     const chains: string[][] = [];
     affectedNodes.forEach((node) => {
