@@ -1,9 +1,9 @@
-import { GroupsJsonReport, GroupsReport } from '../group-manager.types';
+import { GroupsChunks, GroupsChunksJson } from '../group-manager.types';
 
-export function groupsJsonReportConverter(input: GroupsReport): GroupsJsonReport {
+export function groupsJsonReportConverter(input: GroupsChunks): GroupsChunksJson {
   return {
     groupBy: input.groupBy,
-    groups: input.groups.map((chunk) => {
+    data: input.data.map((chunk) => {
       return chunk.map((node) => node.name);
     }),
   };

@@ -7,12 +7,12 @@ export interface GroupManagerProps {
   input: TreeNode[];
 }
 
-export interface GroupsReport {
+export interface GroupsChunks {
   groupBy: number;
-  groups: TreeNode[][];
+  data: TreeNode[][];
 }
 
-export interface GroupsJsonReport {
+export interface GroupsChunksJson {
   groupBy: number;
-  groups: string[][];
+  data: string[][];
 }

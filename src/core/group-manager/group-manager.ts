@@ -1,7 +1,7 @@
 import { chunkBy } from '../../utils/array.utils';
 import { getInvertedMap } from '../../utils/map.utils';
 import { TreeNode } from '../workspace-tree';
-import { GroupManagerProps, GroupsReport } from './group-manager.types';
+import { GroupManagerProps, GroupsChunks } from './group-manager.types';
 import { GroupRankResolver } from './group-rank.resolver';
 
 export class GroupManager {
@@ -11,17 +11,27 @@ export class GroupManager {
     this.rankResolver = new GroupRankResolver();
   }
 
-  public flatGroups(props: GroupManagerProps): GroupsReport {
-    const { groupBy, input } = props;
-    let groups: TreeNode[][] = [];
+  public list(nodes: TreeNode[]): TreeNode[] {
+    let data: TreeNode[] = [];
 
-    const rankMap = this.rankResolver.resolve(input);
-    const invertedMap = getInvertedMap(rankMap);
-    invertedMap.forEach((nodesList) => {
-      const rankGroup = chunkBy(nodesList, groupBy);
-      groups = [...groups, ...rankGroup];
+    const rankMap = this.rankResolver.resolve(nodes);
+    getInvertedMap(rankMap).forEach((nodesList) => {
+      data = data.concat(nodesList);
     });
 
-    return { groupBy, groups };
+    return data;
+  }
+
+  public chunks(props: GroupManagerProps): GroupsChunks {
+    const { groupBy, input } = props;
+    let data: TreeNode[][] = [];
+
+    const rankMap = this.rankResolver.resolve(input);
+    getInvertedMap(rankMap).forEach((nodesList) => {
+      const rankGroup = chunkBy(nodesList, groupBy);
+      data = data.concat(rankGroup);
+    });
+
+    return { groupBy, data };
   }
 }

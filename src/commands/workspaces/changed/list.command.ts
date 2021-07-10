@@ -3,6 +3,8 @@ import { Command, Usage } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
 
 import { VersionManager } from '../../../core/version-manager';
+import { GroupManager } from '../../../core/group-manager';
+import { getMapValues } from '../../../utils/map.utils';
 
 export class ListCommand extends Command<CommandContext> {
   // Meta
@@ -11,13 +13,9 @@ export class ListCommand extends Command<CommandContext> {
     description: 'Prints workspaces that should be utilized.',
   });
 
-  @Command.Boolean('-v,--verbose', {
-    description: 'Print detailed workspaces parent chunks',
-  })
-  public verbose: boolean = false;
-
   // Dependencies
   public readonly versionManager: VersionManager = new VersionManager();
+  public readonly groupManager: GroupManager = new GroupManager();
 
   // Commands
   @Command.Path('workspaces', 'changed', 'list')
@@ -26,25 +24,10 @@ export class ListCommand extends Command<CommandContext> {
     const { project } = await Project.find(configuration, this.context.cwd);
 
     const affectedNodes = await this.versionManager.findCandidates(project);
-    if (affectedNodes.size === 0) {
-      console.dir('No affected workspaces.');
-      return;
-    }
 
-    const chains: string[][] = [];
-    affectedNodes.forEach((node) => {
-      if (this.verbose) {
-        const chain: string[] = [...node.chain].map((locator) => {
-          const { manifest } = project.getWorkspaceByLocator(locator);
-          return manifest.raw.name;
-        });
-        chains.push(chain);
-      } else {
-        chains.push([node.name]);
-      }
+    const nodesList = this.groupManager.list(getMapValues(affectedNodes)).map((node) => {
+      return node.name;
     });
-
-    console.dir('Affected chains:');
-    chains.forEach((chain) => console.dir(chain.join(' → ')));
+    console.log(JSON.stringify(nodesList));
   }
 }
