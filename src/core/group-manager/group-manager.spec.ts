@@ -4,7 +4,7 @@ import { SampleNode } from './__tests__/sample.node';
 describe('GroupManager', () => {
   const groupManager = new GroupManager();
 
-  describe('#flatGroups', () => {
+  describe('#chunks', () => {
     it('generates groups for simple tries', () => {
       // Preset
       const a = new SampleNode('a');
@@ -17,13 +17,13 @@ describe('GroupManager', () => {
       c.addChildren(d).addChildren(e);
 
       const props = { groupBy: 2, input: [b, d, e] };
-      const report = groupManager.flatGroups(props);
+      const report = groupManager.chunks(props);
 
       expect(report.groupBy).toBe(props.groupBy);
-      expect(report.groups.length).toBe(2);
+      expect(report.data.length).toBe(2);
 
-      expect(report.groups[0]).toMatchObject([b]);
-      expect(report.groups[1]).toMatchObject([d, e]);
+      expect(report.data[0]).toMatchObject([b]);
+      expect(report.data[1]).toMatchObject([d, e]);
     });
 
     it('generates groups for simple tries grouped by 1', () => {
@@ -38,14 +38,14 @@ describe('GroupManager', () => {
       c.addChildren(d).addChildren(e);
 
       const props = { groupBy: 1, input: [b, d, e] };
-      const report = groupManager.flatGroups(props);
+      const report = groupManager.chunks(props);
 
       expect(report.groupBy).toBe(props.groupBy);
-      expect(report.groups.length).toBe(3);
+      expect(report.data.length).toBe(3);
 
-      expect(report.groups[0]).toMatchObject([b]);
-      expect(report.groups[1]).toMatchObject([d]);
-      expect(report.groups[2]).toMatchObject([e]);
+      expect(report.data[0]).toMatchObject([b]);
+      expect(report.data[1]).toMatchObject([d]);
+      expect(report.data[2]).toMatchObject([e]);
     });
   });
 });

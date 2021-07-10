@@ -32,9 +32,9 @@ export class ChunksCommand extends Command<CommandContext> {
     const { project } = await Project.find(configuration, this.context.cwd);
 
     const affectedNodes = await this.versionManager.findCandidates(project);
-    const groups = this.groupManager.flatGroups({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });
+    const groups = this.groupManager.chunks({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });
 
-    console.dir(JSON.stringify(groupsJsonReportConverter(groups)));
+    console.log(JSON.stringify(groupsJsonReportConverter(groups)));
   }
 
   private validateInput(): void {
