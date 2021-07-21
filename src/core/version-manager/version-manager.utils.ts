@@ -2,14 +2,21 @@ import { PortablePath } from '@yarnpkg/fslib';
 import { execUtils, miscUtils, Project, Workspace } from '@yarnpkg/core';
 import { ppath, npath } from '@yarnpkg/fslib';
 
+// Get latest commit hash for the actual branch
 async function getLatestHash(root: PortablePath): Promise<string> {
   const options = { cwd: root, strict: true };
 
-  const { stdout } = await execUtils.execvp('git', ['describe', '--tags', '--abbrev=0'], options);
-  const { stdout: latestHash } = await execUtils.execvp('git', ['rev-list', '-n', '1', stdout.trim()], options);
+  const { stdout: latestTagOut } = await execUtils.execvp('git', ['describe', '--tags', '--abbrev=0'], options);
+  const latestTag = latestTagOut.trim();
+  if (!latestTag) {
+    return '';
+  }
+
+  const { stdout: latestHash } = await execUtils.execvp('git', ['rev-list', '-n', '1', latestTag], options);
   return latestHash.trim();
 }
 
+// Get commit hash using merge-base strategy
 async function mergeBaseHash(root: PortablePath): Promise<string> {
   const { stdout: mergeBaseStdout } = await execUtils.execvp('git', ['merge-base', 'HEAD', 'master', 'origin/master'], {
     cwd: root,
@@ -18,6 +25,7 @@ async function mergeBaseHash(root: PortablePath): Promise<string> {
   return mergeBaseStdout.trim();
 }
 
+// Find a commit hash for comparing current changes
 export async function findBaseCommit(root: PortablePath): Promise<string> {
   const latestHash = await getLatestHash(root);
   return latestHash ? latestHash : await mergeBaseHash(root);
@@ -29,16 +37,17 @@ const fileSelector = (root: PortablePath, input: string): PortablePath[] =>
     .filter((file) => file.length > 0)
     .map((file) => ppath.resolve(root, npath.toPortablePath(file)));
 
+// Find changed files from a commit hash
 export async function findChangedFiles(
   root: PortablePath,
-  baseHash: string,
+  commitHash: string,
   projectCwd: PortablePath,
   excludeList: string[] = [],
 ): Promise<PortablePath[]> {
   const options = { cwd: root, strict: true };
 
   // Get tracked files
-  const { stdout: local } = await execUtils.execvp('git', ['diff', '--name-only', `${baseHash}`], options);
+  const { stdout: local } = await execUtils.execvp('git', ['diff', '--name-only', commitHash], options);
   const trackedFiles = fileSelector(root, local);
 
   // Get untracked files
@@ -54,6 +63,7 @@ export async function findChangedFiles(
   return changedFiles;
 }
 
+// Find change workspaces using changed files list
 export function findChangedWorkspaces(project: Project, changedList: PortablePath[]): Set<Workspace> {
   const changedWorkspaces: Workspace[] = miscUtils.mapAndFilter(changedList, (file) => {
     const workspace = project.tryWorkspaceByFilePath(file);

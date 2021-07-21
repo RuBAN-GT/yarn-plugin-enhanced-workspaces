@@ -19,6 +19,9 @@ export class VersionManager {
 
     // Exclude root workspace in order to avoid duplicated operations
     const affectedWorkspaces = [...changedWorkspaces].filter((w) => w !== project.topLevelWorkspace);
+    if (affectedWorkspaces.length === 0) {
+      return new Map();
+    }
 
     // Take affected nodes
     const rootNode = await this.workspaceResolver.resolve(project);
@@ -34,14 +37,18 @@ export class VersionManager {
 
     const rootPath = configuration.projectCwd;
 
+    // @TODO Add strategy to configuration
     const baseHash = await findBaseCommit(configuration.projectCwd);
+    if (!baseHash) {
+      return new Set();
+    }
+
     const changedFiles = await findChangedFiles(
       rootPath,
       baseHash,
       project.cwd,
       project.configuration.get('changesetIgnorePatterns'),
     );
-
     return findChangedWorkspaces(project, changedFiles);
   }
 
