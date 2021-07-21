@@ -1,8 +1,8 @@
 import { Locator, Project, Workspace } from '@yarnpkg/core';
+import { UsageError } from 'clipanion';
 
-import { openVersionFile, VersionFile } from '../../utils/version.utils';
-import { NoChangesError } from '../errors';
 import { WorkspaceNode, WorkspaceTreeManager, WorkspaceTreeResolver } from '../workspace-tree';
+import { findBaseCommit, findChangedFiles, findChangedWorkspaces } from './version-manager.utils';
 
 export class VersionManager {
   protected readonly workspaceResolver: WorkspaceTreeResolver;
@@ -15,24 +15,41 @@ export class VersionManager {
    * Find the most deepest workspaces nodes with changed files
    */
   public async findCandidates(project: Project): Promise<Map<Locator, WorkspaceNode>> {
-    const rootNode = await this.workspaceResolver.resolve(project);
-    const treeManager = new WorkspaceTreeManager(rootNode);
-    const versionFile = await this.generateVersionFile(project);
+    const changedWorkspaces = await this.findAffectedWorkspaces(project);
 
     // Exclude root workspace in order to avoid duplicated operations
-    const changedWorkspaces = [...versionFile.changedWorkspaces].filter((w) => w !== project.topLevelWorkspace);
-
-    // Take affected nodes
-    return this.findAffectedNodes(treeManager, changedWorkspaces);
-  }
-
-  protected async generateVersionFile(project: Project): Promise<VersionFile> {
-    const versionFile = await openVersionFile(project);
-    if (!versionFile) {
-      throw new NoChangesError();
+    const affectedWorkspaces = [...changedWorkspaces].filter((w) => w !== project.topLevelWorkspace);
+    if (affectedWorkspaces.length === 0) {
+      return new Map();
     }
 
-    return versionFile;
+    // Take affected nodes
+    const rootNode = await this.workspaceResolver.resolve(project);
+    const treeManager = new WorkspaceTreeManager(rootNode);
+    return this.findAffectedNodes(treeManager, affectedWorkspaces);
+  }
+
+  protected async findAffectedWorkspaces(project: Project): Promise<Set<Workspace>> {
+    const { configuration } = project;
+    if (configuration.projectCwd === null) {
+      throw new UsageError('Invalid project configuration.');
+    }
+
+    const rootPath = configuration.projectCwd;
+
+    // @TODO Add strategy to configuration
+    const baseHash = await findBaseCommit(configuration.projectCwd);
+    if (!baseHash) {
+      return new Set();
+    }
+
+    const changedFiles = await findChangedFiles(
+      rootPath,
+      baseHash,
+      project.cwd,
+      project.configuration.get('changesetIgnorePatterns'),
+    );
+    return findChangedWorkspaces(project, changedFiles);
   }
 
   protected findAffectedNodes(
