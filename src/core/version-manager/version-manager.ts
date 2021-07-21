@@ -1,8 +1,8 @@
 import { Locator, Project, Workspace } from '@yarnpkg/core';
+import { UsageError } from 'clipanion';
 
-import { openVersionFile, VersionFile } from '../../utils/version.utils';
-import { NoChangesError } from '../errors';
 import { WorkspaceNode, WorkspaceTreeManager, WorkspaceTreeResolver } from '../workspace-tree';
+import { findBaseCommit, findChangedFiles, findChangedWorkspaces } from './version-manager.utils';
 
 export class VersionManager {
   protected readonly workspaceResolver: WorkspaceTreeResolver;
@@ -15,24 +15,34 @@ export class VersionManager {
    * Find the most deepest workspaces nodes with changed files
    */
   public async findCandidates(project: Project): Promise<Map<Locator, WorkspaceNode>> {
-    const rootNode = await this.workspaceResolver.resolve(project);
-    const treeManager = new WorkspaceTreeManager(rootNode);
-    const versionFile = await this.generateVersionFile(project);
+    const changedWorkspaces = await this.findAffectedWorkspaces(project);
 
     // Exclude root workspace in order to avoid duplicated operations
-    const changedWorkspaces = [...versionFile.changedWorkspaces].filter((w) => w !== project.topLevelWorkspace);
+    const affectedWorkspaces = [...changedWorkspaces].filter((w) => w !== project.topLevelWorkspace);
 
     // Take affected nodes
-    return this.findAffectedNodes(treeManager, changedWorkspaces);
+    const rootNode = await this.workspaceResolver.resolve(project);
+    const treeManager = new WorkspaceTreeManager(rootNode);
+    return this.findAffectedNodes(treeManager, affectedWorkspaces);
   }
 
-  protected async generateVersionFile(project: Project): Promise<VersionFile> {
-    const versionFile = await openVersionFile(project);
-    if (!versionFile) {
-      throw new NoChangesError();
+  protected async findAffectedWorkspaces(project: Project): Promise<Set<Workspace>> {
+    const { configuration } = project;
+    if (configuration.projectCwd === null) {
+      throw new UsageError('Invalid project configuration.');
     }
 
-    return versionFile;
+    const rootPath = configuration.projectCwd;
+
+    const baseHash = await findBaseCommit(configuration.projectCwd);
+    const changedFiles = await findChangedFiles(
+      rootPath,
+      baseHash,
+      project.cwd,
+      project.configuration.get('changesetIgnorePatterns'),
+    );
+
+    return findChangedWorkspaces(project, changedFiles);
   }
 
   protected findAffectedNodes(
