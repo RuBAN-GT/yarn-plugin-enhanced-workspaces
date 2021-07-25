@@ -16,19 +16,37 @@ async function getLatestHash(root: PortablePath): Promise<string> {
   return latestHash.trim();
 }
 
+// Find existing base ref candidates
+async function findBaseCandidates(root: PortablePath, baseRefs: string[]): Promise<string[]> {
+  const refs: string[] = [];
+  for (const ref of baseRefs) {
+    const { code } = await execUtils.execvp('git', ['merge-base', ref, 'HEAD'], { cwd: root, strict: false });
+    if (code === 0) {
+      refs.push(ref);
+    }
+  }
+
+  return refs;
+}
+
 // Get commit hash using merge-base strategy
-async function mergeBaseHash(root: PortablePath): Promise<string> {
-  const { stdout: mergeBaseStdout } = await execUtils.execvp('git', ['merge-base', 'HEAD', 'master', 'origin/master'], {
+async function mergeBaseHash(root: PortablePath, baseRefs: string[] = []): Promise<string> {
+  const baseCandidates = await findBaseCandidates(root, baseRefs);
+  if (baseCandidates.length === 0) {
+    return '';
+  }
+
+  const { stdout: mergeBaseStdout } = await execUtils.execvp('git', ['merge-base', 'HEAD', ...baseCandidates], {
     cwd: root,
-    strict: true,
+    strict: false,
   });
   return mergeBaseStdout.trim();
 }
 
 // Find a commit hash for comparing current changes
-export async function findBaseCommit(root: PortablePath): Promise<string> {
+export async function findBaseCommit(root: PortablePath, baseRefs: string[] = []): Promise<string> {
   const latestHash = await getLatestHash(root);
-  return latestHash ? latestHash : await mergeBaseHash(root);
+  return latestHash ? latestHash : await mergeBaseHash(root, baseRefs);
 }
 
 const fileSelector = (root: PortablePath, input: string): PortablePath[] =>

@@ -38,7 +38,7 @@ export class VersionManager {
     const rootPath = configuration.projectCwd;
 
     // @TODO Add strategy to configuration
-    const baseHash = await findBaseCommit(configuration.projectCwd);
+    const baseHash = await findBaseCommit(configuration.projectCwd, configuration.get('changesetBaseRefs'));
     if (!baseHash) {
       return new Set();
     }
