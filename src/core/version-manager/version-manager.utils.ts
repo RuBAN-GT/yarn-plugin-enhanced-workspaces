@@ -4,7 +4,7 @@ import { ppath, npath } from '@yarnpkg/fslib';
 
 // Get latest commit hash for the actual branch
 async function getLatestHash(root: PortablePath): Promise<string> {
-  const options = { cwd: root, strict: true };
+  const options = { cwd: root, strict: false };
 
   const { stdout: latestTagOut } = await execUtils.execvp('git', ['describe', '--tags', '--abbrev=0'], options);
   const latestTag = latestTagOut.trim();
