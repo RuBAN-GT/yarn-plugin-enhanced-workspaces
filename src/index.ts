@@ -8,7 +8,7 @@ import { ForeachCommand } from './commands/workspaces/foreach';
 const plugin: Plugin = {
   configuration: {
     changeDetectionStrategy: {
-      description: 'With which source the plugin should determine workspaces changes',
+      description: 'Which source the plugin should use in order to determine workspaces changes.',
       type: SettingsType.STRING,
       isNullable: false,
       default: ChangeDetectionStrategy.baseRef,

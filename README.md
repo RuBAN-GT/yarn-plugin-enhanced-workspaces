@@ -17,3 +17,9 @@ yarn plugin import https://raw.githubusercontent.com/RuBAN-GT/yarn-plugin-enhanc
   * `--include` - a list of included workspaces
   * `--exclude` - a list of excluded workspaces
   * `-p, --parallel` - run the commands in parallel
+
+## Configuration
+
+The plugin provides the next configurable options:
+
+* `changeDetectionStrategy` - Which source the plugin should use in order to determine workspaces changes. Can be `base-ref` or `prev-ref`.
