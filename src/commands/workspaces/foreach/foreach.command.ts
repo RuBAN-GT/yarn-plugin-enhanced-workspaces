@@ -22,6 +22,9 @@ export class ForeachCommand extends Command<CommandContext> {
   @Command.Boolean('-p,--parallel', { description: 'Run the commands in parallel' })
   public isParallel: boolean = false;
 
+  @Command.Boolean('-a,--ancestor', { description: 'Perform operation over ancestors' })
+  public withAncestor: boolean = true;
+
   // Meta
   public static usage: Usage = Command.Usage({
     category: 'Workspace-related commands',
@@ -34,6 +37,8 @@ export class ForeachCommand extends Command<CommandContext> {
   // Commands
   @Command.Path('workspaces', 'changed', 'foreach')
   public async execute(): Promise<void> {
+    console.dir('A');
+    console.dir(this.withAncestor);
     const config = await Configuration.find(this.context.cwd, this.context.plugins);
     const { project } = await Project.find(config, this.context.cwd);
 
@@ -53,7 +58,7 @@ export class ForeachCommand extends Command<CommandContext> {
   }
 
   private async getAffectedList(project: Project): Promise<string[]> {
-    const affectedNodes = await this.cdManager.findCandidates(project);
+    const affectedNodes = await this.cdManager.findCandidates(project, this.withAncestor);
     const affectedList: string[] = [];
     affectedNodes.forEach((node) => {
       if (

@@ -6,6 +6,8 @@ import { refDetectorResolver } from './utils/ref-detector.resolver';
 import { findChangedWorkspaces } from './utils/find-changed-workspaces';
 import { findChangedFiles } from './utils/find-changed-files';
 
+type CandidatesMap = Map<Locator, WorkspaceNode>;
+
 export class ChangeDetectionManager {
   protected readonly workspaceResolver: WorkspaceTreeResolver;
 
@@ -16,7 +18,7 @@ export class ChangeDetectionManager {
   /**
    * Find the most deepest workspaces nodes with changed files
    */
-  public async findCandidates(project: Project): Promise<Map<Locator, WorkspaceNode>> {
+  public async findCandidates(project: Project, withAncestor: boolean = false): Promise<CandidatesMap> {
     const changedWorkspaces = await this.findAffectedWorkspaces(project);
 
     // Exclude root workspace in order to avoid duplicated operations
@@ -28,7 +30,9 @@ export class ChangeDetectionManager {
     // Take affected nodes
     const rootNode = await this.workspaceResolver.resolve(project);
     const treeManager = new WorkspaceTreeManager(rootNode);
-    return this.findAffectedNodes(treeManager, affectedWorkspaces);
+    const nodes = this.findAffectedNodes(treeManager, affectedWorkspaces);
+
+    return withAncestor ? this.mixAncestorsNodes(treeManager, nodes) : nodes;
   }
 
   protected async findAffectedWorkspaces(project: Project): Promise<Set<Workspace>> {
@@ -42,11 +46,8 @@ export class ChangeDetectionManager {
     return findChangedWorkspaces(project, changedFiles);
   }
 
-  protected findAffectedNodes(
-    treeManager: WorkspaceTreeManager,
-    changedWorkspaces: Workspace[],
-  ): Map<Locator, WorkspaceNode> {
-    const affectedMap: Map<Locator, WorkspaceNode> = new Map();
+  protected findAffectedNodes(treeManager: WorkspaceTreeManager, changedWorkspaces: Workspace[]): CandidatesMap {
+    const affectedMap: CandidatesMap = new Map();
 
     treeManager.findNodesByWorkspaces(changedWorkspaces).forEach((node) => {
       const locator = node.workspace.locator;
@@ -58,5 +59,14 @@ export class ChangeDetectionManager {
     });
 
     return affectedMap;
+  }
+
+  protected mixAncestorsNodes(treeManager: WorkspaceTreeManager, nodes: CandidatesMap): CandidatesMap {
+    const fullNodes: CandidatesMap = new Map();
+    nodes.forEach((node) => {
+      treeManager.findNodesByIds(node.chain).forEach((node) => fullNodes.set(node.id, node));
+    });
+
+    return fullNodes;
   }
 }
