@@ -2,9 +2,13 @@ import { Locator, Project, Workspace } from '@yarnpkg/core';
 import { UsageError } from 'clipanion';
 
 import { WorkspaceNode, WorkspaceTreeManager, WorkspaceTreeResolver } from '../workspace-tree';
-import { findBaseCommit, findChangedFiles, findChangedWorkspaces } from './version-manager.utils';
+import { refDetectorResolver } from './utils/ref-detector.resolver';
+import { findChangedWorkspaces } from './utils/find-changed-workspaces';
+import { findChangedFiles } from './utils/find-changed-files';
 
-export class VersionManager {
+type CandidatesMap = Map<Locator, WorkspaceNode>;
+
+export class ChangeDetectionManager {
   protected readonly workspaceResolver: WorkspaceTreeResolver;
 
   constructor() {
@@ -14,7 +18,7 @@ export class VersionManager {
   /**
    * Find the most deepest workspaces nodes with changed files
    */
-  public async findCandidates(project: Project): Promise<Map<Locator, WorkspaceNode>> {
+  public async findCandidates(project: Project, withAncestor: boolean = false): Promise<CandidatesMap> {
     const changedWorkspaces = await this.findAffectedWorkspaces(project);
 
     // Exclude root workspace in order to avoid duplicated operations
@@ -26,37 +30,24 @@ export class VersionManager {
     // Take affected nodes
     const rootNode = await this.workspaceResolver.resolve(project);
     const treeManager = new WorkspaceTreeManager(rootNode);
-    return this.findAffectedNodes(treeManager, affectedWorkspaces);
+    const nodes = this.findAffectedNodes(treeManager, affectedWorkspaces);
+
+    return withAncestor ? this.mixAncestorsNodes(treeManager, nodes) : nodes;
   }
 
   protected async findAffectedWorkspaces(project: Project): Promise<Set<Workspace>> {
-    const { configuration } = project;
-    if (configuration.projectCwd === null) {
+    if (!project.configuration.projectCwd) {
       throw new UsageError('Invalid project configuration.');
     }
 
-    const rootPath = configuration.projectCwd;
+    const anchorHash = await refDetectorResolver(project);
+    const changedFiles = await findChangedFiles(project, anchorHash);
 
-    // @TODO Add strategy to configuration
-    const baseHash = await findBaseCommit(configuration.projectCwd, configuration.get('changesetBaseRefs'));
-    if (!baseHash) {
-      return new Set();
-    }
-
-    const changedFiles = await findChangedFiles(
-      rootPath,
-      baseHash,
-      project.cwd,
-      project.configuration.get('changesetIgnorePatterns'),
-    );
     return findChangedWorkspaces(project, changedFiles);
   }
 
-  protected findAffectedNodes(
-    treeManager: WorkspaceTreeManager,
-    changedWorkspaces: Workspace[],
-  ): Map<Locator, WorkspaceNode> {
-    const affectedMap: Map<Locator, WorkspaceNode> = new Map();
+  protected findAffectedNodes(treeManager: WorkspaceTreeManager, changedWorkspaces: Workspace[]): CandidatesMap {
+    const affectedMap: CandidatesMap = new Map();
 
     treeManager.findNodesByWorkspaces(changedWorkspaces).forEach((node) => {
       const locator = node.workspace.locator;
@@ -68,5 +59,14 @@ export class VersionManager {
     });
 
     return affectedMap;
+  }
+
+  protected mixAncestorsNodes(treeManager: WorkspaceTreeManager, nodes: CandidatesMap): CandidatesMap {
+    const fullNodes: CandidatesMap = new Map();
+    nodes.forEach((node) => {
+      treeManager.findNodesByIds(node.chain).forEach((node) => fullNodes.set(node.id, node));
+    });
+
+    return fullNodes;
   }
 }

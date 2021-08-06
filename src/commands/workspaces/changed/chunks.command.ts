@@ -2,7 +2,7 @@ import { CommandContext, Project } from '@yarnpkg/core';
 import { Command, Usage, UsageError } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
 
-import { VersionManager } from '../../../core/version-manager';
+import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { GroupManager, groupsJsonReportConverter } from '../../../core/group-manager';
 import { getMapValues } from '../../../utils/map.utils';
 import { getAvailableProcessesCount } from '../../../utils/system.utils';
@@ -20,7 +20,7 @@ export class ChunksCommand extends Command<CommandContext> {
   public groupBy: string | number = getAvailableProcessesCount();
 
   // Dependencies
-  public readonly versionManager: VersionManager = new VersionManager();
+  public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
   public readonly groupManager: GroupManager = new GroupManager();
 
   // Commands
@@ -31,7 +31,7 @@ export class ChunksCommand extends Command<CommandContext> {
     const configuration = await Configuration.find(this.context.cwd, this.context.plugins);
     const { project } = await Project.find(configuration, this.context.cwd);
 
-    const affectedNodes = await this.versionManager.findCandidates(project);
+    const affectedNodes = await this.cdManager.findCandidates(project);
     const groups = this.groupManager.chunks({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });
 
     console.log(JSON.stringify(groupsJsonReportConverter(groups)));
