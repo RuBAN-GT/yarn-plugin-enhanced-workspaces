@@ -6,6 +6,6 @@ export const refDetectorPrevRef: RefDetector = async (props: RefDetectorProps): 
   const { projectCwd } = props;
   const options = { cwd: projectCwd, strict: false };
 
-  const { stdout } = await execUtils.execvp('git', ['rev-parse', 'HEAD'], options);
+  const { stdout } = await execUtils.execvp('git', ['rev-parse', 'HEAD^1'], options);
   return { commit: stdout.trim() };
 };
