@@ -2,7 +2,7 @@ import { CommandContext, Project } from '@yarnpkg/core';
 import { Command, Usage } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
 
-import { VersionManager } from '../../../core/version-manager';
+import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { GroupManager } from '../../../core/group-manager';
 import { getMapValues } from '../../../utils/map.utils';
 
@@ -14,7 +14,7 @@ export class ListCommand extends Command<CommandContext> {
   });
 
   // Dependencies
-  public readonly versionManager: VersionManager = new VersionManager();
+  public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
   public readonly groupManager: GroupManager = new GroupManager();
 
   // Commands
@@ -23,8 +23,7 @@ export class ListCommand extends Command<CommandContext> {
     const configuration = await Configuration.find(this.context.cwd, this.context.plugins);
     const { project } = await Project.find(configuration, this.context.cwd);
 
-    const affectedNodes = await this.versionManager.findCandidates(project);
-
+    const affectedNodes = await this.cdManager.findCandidates(project);
     const nodesList = this.groupManager.list(getMapValues(affectedNodes)).map((node) => {
       return node.name;
     });

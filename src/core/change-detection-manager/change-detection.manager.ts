@@ -2,9 +2,11 @@ import { Locator, Project, Workspace } from '@yarnpkg/core';
 import { UsageError } from 'clipanion';
 
 import { WorkspaceNode, WorkspaceTreeManager, WorkspaceTreeResolver } from '../workspace-tree';
-import { findBaseCommit, findChangedFiles, findChangedWorkspaces } from './version-manager.utils';
+import { refDetectorResolver } from './utils/ref-detector.resolver';
+import { findChangedWorkspaces } from './utils/find-changed-workspaces';
+import { findChangedFiles } from './utils/find-changed-files';
 
-export class VersionManager {
+export class ChangeDetectionManager {
   protected readonly workspaceResolver: WorkspaceTreeResolver;
 
   constructor() {
@@ -30,25 +32,13 @@ export class VersionManager {
   }
 
   protected async findAffectedWorkspaces(project: Project): Promise<Set<Workspace>> {
-    const { configuration } = project;
-    if (configuration.projectCwd === null) {
+    if (!project.configuration.projectCwd) {
       throw new UsageError('Invalid project configuration.');
     }
 
-    const rootPath = configuration.projectCwd;
+    const anchorHash = await refDetectorResolver(project);
+    const changedFiles = await findChangedFiles(project, anchorHash);
 
-    // @TODO Add strategy to configuration
-    const baseHash = await findBaseCommit(configuration.projectCwd, configuration.get('changesetBaseRefs'));
-    if (!baseHash) {
-      return new Set();
-    }
-
-    const changedFiles = await findChangedFiles(
-      rootPath,
-      baseHash,
-      project.cwd,
-      project.configuration.get('changesetIgnorePatterns'),
-    );
     return findChangedWorkspaces(project, changedFiles);
   }
 

@@ -2,7 +2,7 @@ import { CommandContext, Project } from '@yarnpkg/core';
 import { Command, Usage, UsageError } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
 
-import { VersionManager } from '../../../core/version-manager';
+import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { WORKSPACE_PLUGIN_NAME } from './foreach.consts';
 
 export class ForeachCommand extends Command<CommandContext> {
@@ -29,7 +29,7 @@ export class ForeachCommand extends Command<CommandContext> {
   });
 
   // Dependencies
-  public readonly versionManager: VersionManager = new VersionManager();
+  public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
 
   // Commands
   @Command.Path('workspaces', 'changed', 'foreach')
@@ -53,7 +53,7 @@ export class ForeachCommand extends Command<CommandContext> {
   }
 
   private async getAffectedList(project: Project): Promise<string[]> {
-    const affectedNodes = await this.versionManager.findCandidates(project);
+    const affectedNodes = await this.cdManager.findCandidates(project);
     const affectedList: string[] = [];
     affectedNodes.forEach((node) => {
       if (
