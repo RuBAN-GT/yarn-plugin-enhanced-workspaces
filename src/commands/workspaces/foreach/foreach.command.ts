@@ -22,7 +22,7 @@ export class ForeachCommand extends Command<CommandContext> {
   @Command.Boolean('-p,--parallel', { description: 'Run the commands in parallel' })
   public isParallel: boolean = false;
 
-  @Command.Boolean('-a,--ancestor', { description: 'Perform operation over ancestors' })
+  @Command.Boolean('-a,--ancestors', { description: 'Perform operation over ancestors' })
   public withAncestor: boolean = false;
 
   // Meta
