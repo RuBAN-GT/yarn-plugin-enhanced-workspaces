@@ -23,7 +23,7 @@ export class ForeachCommand extends Command<CommandContext> {
   public isParallel: boolean = false;
 
   @Command.Boolean('-a,--ancestor', { description: 'Perform operation over ancestors' })
-  public withAncestor: boolean = true;
+  public withAncestor: boolean = false;
 
   // Meta
   public static usage: Usage = Command.Usage({
@@ -37,8 +37,6 @@ export class ForeachCommand extends Command<CommandContext> {
   // Commands
   @Command.Path('workspaces', 'changed', 'foreach')
   public async execute(): Promise<void> {
-    console.dir('A');
-    console.dir(this.withAncestor);
     const config = await Configuration.find(this.context.cwd, this.context.plugins);
     const { project } = await Project.find(config, this.context.cwd);
 
