@@ -24,3 +24,5 @@ yarn plugin import https://raw.githubusercontent.com/RuBAN-GT/yarn-plugin-enhanc
 The plugin provides the next configurable options:
 
 * `changeDetectionStrategy` - Which source the plugin should use in order to determine workspaces changes. Can be `base-ref` or `prev-ref`.
+* `ignoredAncestorsMarkers` - If ancestor workspace contains these files/directories it will be excluded from execution list. Should be defined a string list.
+* `preserveAncestors` - Preserve ancestors of changed workspaces. Should be defined as a boolean flag.
