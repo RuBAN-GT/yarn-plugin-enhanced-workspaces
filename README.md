@@ -18,6 +18,7 @@ yarn plugin import https://raw.githubusercontent.com/RuBAN-GT/yarn-plugin-enhanc
   * `--exclude` - a list of excluded workspaces
   * `-p, --parallel` - run the commands in parallel
   * `-a, --ancestors/--no-ancestors` - perform operation over ancestors
+  * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
 
 ## Configuration
 
