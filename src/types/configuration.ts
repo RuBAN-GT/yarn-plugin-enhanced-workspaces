@@ -6,5 +6,7 @@ export enum ChangeDetectionStrategy {
 declare module '@yarnpkg/core' {
   interface ConfigurationValueMap {
     changeDetectionStrategy: string;
+    preserveAncestors: boolean;
+    ignoredAncestorsMarkers: string[];
   }
 }

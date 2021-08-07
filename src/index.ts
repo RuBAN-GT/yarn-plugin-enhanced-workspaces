@@ -14,6 +14,19 @@ const plugin: Plugin = {
       default: ChangeDetectionStrategy.baseRef,
       values: [ChangeDetectionStrategy.baseRef, ChangeDetectionStrategy.prevRef],
     },
+    ignoredAncestorsMarkers: {
+      description: 'If ancestor workspace contains these files/directories it will be excluded from execution list.',
+      type: SettingsType.STRING,
+      isNullable: false,
+      isArray: true,
+      default: [],
+    },
+    preserveAncestors: {
+      description: 'Preserve ancestors of changed workspaces.',
+      type: SettingsType.BOOLEAN,
+      isNullable: false,
+      default: false,
+    },
   },
   commands: [GraphCommand, ChunksCommand, ListCommand, ForeachCommand],
 };
