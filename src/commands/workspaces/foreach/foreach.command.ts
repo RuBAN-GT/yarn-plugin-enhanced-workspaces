@@ -11,19 +11,22 @@ export class ForeachCommand extends Command<CommandContext> {
   public commandName!: string;
 
   @Command.Proxy()
-  public args: Array<string> = [];
+  public args: string[] = [];
 
   @Command.Array('--exclude', { description: 'Exclude specific workspaces' })
-  public excludeList: Array<string> = [];
+  public excludeList: string[] = [];
 
-  @Command.Array('--exclude', { description: 'Include specific workspaces' })
-  public includeList: Array<string> = [];
+  @Command.Array('--include', { description: 'Include specific workspaces' })
+  public includeList: string[] = [];
 
   @Command.Boolean('-p,--parallel', { description: 'Run the commands in parallel' })
   public isParallel: boolean = false;
 
   @Command.Boolean('-a,--ancestors', { description: 'Perform operation over ancestors' })
   public withAncestor: boolean = false;
+
+  @Command.Array('--ignored-ancestors-markers', { description: 'The same as ignoredAncestorsMarkers' })
+  public ignoredAncestorsMarkers: string[] = [];
 
   // Meta
   public static usage: Usage = Command.Usage({
@@ -56,7 +59,7 @@ export class ForeachCommand extends Command<CommandContext> {
   }
 
   private async getAffectedList(project: Project): Promise<string[]> {
-    const affectedNodes = await this.cdManager.findCandidates(project, this.withAncestor);
+    const affectedNodes = await this.cdManager.findCandidates(project, this.withAncestor, this.ignoredAncestorsMarkers);
     const affectedList: string[] = [];
     affectedNodes.forEach((node) => {
       if (

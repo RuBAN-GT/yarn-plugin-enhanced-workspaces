@@ -19,7 +19,11 @@ export class ChangeDetectionManager {
   /**
    * Find the most deepest workspaces nodes with changed files
    */
-  public async findCandidates(project: Project, withAncestor?: boolean): Promise<CandidatesMap> {
+  public async findCandidates(
+    project: Project,
+    withAncestor?: boolean,
+    ignoredAncestorsMarkers: string[] = [],
+  ): Promise<CandidatesMap> {
     const { topLevelWorkspace, configuration } = project;
     const changedWorkspaces = await this.findAffectedWorkspaces(project);
 
@@ -36,7 +40,9 @@ export class ChangeDetectionManager {
 
     withAncestor = withAncestor === undefined ? configuration.get('preserveAncestors') : withAncestor;
     if (withAncestor) {
-      const result = this.mixAncestorsNodes(treeManager, nodes, configuration.get('ignoredAncestorsMarkers'));
+      ignoredAncestorsMarkers = ignoredAncestorsMarkers || [];
+      const configMarkers = configuration.get('ignoredAncestorsMarkers') || [];
+      const result = this.mixAncestorsNodes(treeManager, nodes, ignoredAncestorsMarkers.concat(configMarkers));
       result.delete(rootNode.workspace.locator);
       return result;
     } else {
