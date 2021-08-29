@@ -6,6 +6,7 @@ import { refDetectorResolver } from './utils/ref-detector.resolver';
 import { findChangedWorkspaces } from './utils/find-changed-workspaces';
 import { findChangedFiles } from './utils/find-changed-files';
 import { markersAreAvailable } from './utils/markers.helper';
+import { ChangeDetectionOptions } from './models/change-detection.options';
 
 type CandidatesMap = Map<Locator, WorkspaceNode>;
 
@@ -19,16 +20,21 @@ export class ChangeDetectionManager {
   /**
    * Find the most deepest workspaces nodes with changed files
    */
-  public async findCandidates(
-    project: Project,
-    withAncestor?: boolean,
-    ignoredAncestorsMarkers: string[] = [],
-  ): Promise<CandidatesMap> {
+  public async findCandidates(project: Project, options: ChangeDetectionOptions = {}): Promise<CandidatesMap> {
     const { topLevelWorkspace, configuration } = project;
+    let { ignoredAncestorsMarkers, withAncestor, withPrivate } = options;
+
     const changedWorkspaces = await this.findAffectedWorkspaces(project);
 
-    // Exclude root workspace in order to avoid duplicated operations
-    const affectedWorkspaces = [...changedWorkspaces].filter((w) => w !== topLevelWorkspace);
+    // Exclude root an optional private workspaces
+    withPrivate = withPrivate === undefined ? configuration.get('detectPrivates') : withPrivate;
+    const affectedWorkspaces = [...changedWorkspaces].filter((workspace) => {
+      if (workspace === topLevelWorkspace) {
+        return false;
+      } else {
+        return !workspace.manifest.private || withPrivate;
+      }
+    });
     if (affectedWorkspaces.length === 0) {
       return new Map();
     }

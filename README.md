@@ -17,13 +17,15 @@ yarn plugin import https://raw.githubusercontent.com/RuBAN-GT/yarn-plugin-enhanc
   * `--include` - a list of included workspaces
   * `--exclude` - a list of excluded workspaces
   * `-p, --parallel` - run the commands in parallel
-  * `-a, --ancestors/--no-ancestors` - perform operation over ancestors
+  * `-a, --ancestors/--no-ancestors` - perform operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
   * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
+  * `--private/--no-private` - include private workspaces into affected list. Default is `true`. More priority than `detectPrivates`.
 
 ## Configuration
 
 The plugin provides the next configurable options:
 
-* `changeDetectionStrategy` - Which source the plugin should use in order to determine workspaces changes. Can be `base-ref` or `prev-ref`.
+* `changeDetectionStrategy` - Which source the plugin should use in order to determine workspaces changes. Can be `base-ref` or `prev-ref`. Default is `base-ref`.
 * `ignoredAncestorsMarkers` - If ancestor workspace contains these files/directories it will be excluded from execution list. Should be defined a string list.
-* `preserveAncestors` - Preserve ancestors of changed workspaces. Should be defined as a boolean flag.
+* `preserveAncestors` - Preserve ancestors of changed workspaces. Should be defined as a boolean flag. Default is `false`.
+* `detectPrivates` - Gather private workspaces into changed list. Should be defined as a boolean flag. Default is `true`.

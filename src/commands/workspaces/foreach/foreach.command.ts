@@ -13,6 +13,9 @@ export class ForeachCommand extends Command<CommandContext> {
   @Command.Proxy()
   public args: string[] = [];
 
+  @Command.Boolean('--private', { description: 'Include private workspaces' })
+  public withPrivate: boolean = true;
+
   @Command.Array('--exclude', { description: 'Exclude specific workspaces' })
   public excludeList: string[] = [];
 
@@ -59,7 +62,11 @@ export class ForeachCommand extends Command<CommandContext> {
   }
 
   private async getAffectedList(project: Project): Promise<string[]> {
-    const affectedNodes = await this.cdManager.findCandidates(project, this.withAncestor, this.ignoredAncestorsMarkers);
+    const affectedNodes = await this.cdManager.findCandidates(project, {
+      withAncestor: this.withAncestor,
+      ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
+      withPrivate: this.withPrivate,
+    });
     const affectedList: string[] = [];
     affectedNodes.forEach((node) => {
       if (

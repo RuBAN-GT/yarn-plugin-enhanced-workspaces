@@ -14,6 +14,12 @@ const plugin: Plugin = {
       default: ChangeDetectionStrategy.baseRef,
       values: [ChangeDetectionStrategy.baseRef, ChangeDetectionStrategy.prevRef],
     },
+    detectPrivates: {
+      description: 'Gather private workspaces into changed list.',
+      type: SettingsType.BOOLEAN,
+      isNullable: false,
+      default: true,
+    },
     ignoredAncestorsMarkers: {
       description: 'If ancestor workspace contains these files/directories it will be excluded from execution list.',
       type: SettingsType.STRING,
