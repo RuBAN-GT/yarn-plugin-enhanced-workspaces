@@ -9,7 +9,9 @@ export async function refDetectorResolver(
   changeDetectionStrategy?: ChangeDetectionStrategy,
 ): Promise<string> {
   const { configuration } = project;
-  changeDetectionStrategy = configuration.get('changeDetectionStrategy') as ChangeDetectionStrategy;
+  if (!changeDetectionStrategy) {
+    changeDetectionStrategy = configuration.get('changeDetectionStrategy') as ChangeDetectionStrategy;
+  }
   const refDetector = refDetectorBuilder(changeDetectionStrategy);
 
   const response = await refDetector({
