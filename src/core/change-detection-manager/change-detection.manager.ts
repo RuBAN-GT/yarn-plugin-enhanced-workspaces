@@ -7,6 +7,7 @@ import { findChangedWorkspaces } from './utils/find-changed-workspaces';
 import { findChangedFiles } from './utils/find-changed-files';
 import { markersAreAvailable } from './utils/markers.helper';
 import { ChangeDetectionOptions } from './models/change-detection.options';
+import { ChangeDetectionStrategy } from '../../types/configuration';
 
 type CandidatesMap = Map<Locator, WorkspaceNode>;
 
@@ -24,7 +25,7 @@ export class ChangeDetectionManager {
     const { topLevelWorkspace, configuration } = project;
     let { ignoredAncestorsMarkers, withAncestor, withPrivate } = options;
 
-    const changedWorkspaces = await this.findAffectedWorkspaces(project);
+    const changedWorkspaces = await this.findAffectedWorkspaces(project, options.changeDetectionStrategy);
 
     // Exclude root an optional private workspaces
     withPrivate = withPrivate === undefined ? configuration.get('detectPrivates') : withPrivate;
@@ -56,12 +57,15 @@ export class ChangeDetectionManager {
     }
   }
 
-  protected async findAffectedWorkspaces(project: Project): Promise<Set<Workspace>> {
+  protected async findAffectedWorkspaces(
+    project: Project,
+    changeDetectionStrategy?: ChangeDetectionStrategy,
+  ): Promise<Set<Workspace>> {
     if (!project.configuration.projectCwd) {
       throw new UsageError('Invalid project configuration.');
     }
 
-    const anchorHash = await refDetectorResolver(project);
+    const anchorHash = await refDetectorResolver(project, changeDetectionStrategy);
     const changedFiles = await findChangedFiles(project, anchorHash);
 
     return findChangedWorkspaces(project, changedFiles);

@@ -4,6 +4,7 @@ import { Configuration } from '@yarnpkg/core';
 
 import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { WORKSPACE_PLUGIN_NAME } from './foreach.consts';
+import { ChangeDetectionStrategy } from '../../../types/configuration';
 
 export class ForeachCommand extends Command<CommandContext> {
   // Params
@@ -30,6 +31,9 @@ export class ForeachCommand extends Command<CommandContext> {
 
   @Command.Array('--ignored-ancestors-markers', { description: 'The same as ignoredAncestorsMarkers' })
   public ignoredAncestorsMarkers: string[] = [];
+
+  @Command.String('-s,--change-detection-strategy', { description: 'Change detection strategy' })
+  public changeDetectionStrategy?: ChangeDetectionStrategy;
 
   // Meta
   public static usage: Usage = Command.Usage({
@@ -63,6 +67,7 @@ export class ForeachCommand extends Command<CommandContext> {
 
   private async getAffectedList(project: Project): Promise<string[]> {
     const affectedNodes = await this.cdManager.findCandidates(project, {
+      changeDetectionStrategy: this.changeDetectionStrategy,
       withAncestor: this.withAncestor,
       ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
       withPrivate: this.withPrivate,

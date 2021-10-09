@@ -1,5 +1,9 @@
 # Yarn independent plugin
 
+## Requirements
+
+**This plugin is only supported on Yarn V2, V3 compatible version will be soon.**
+
 ## Install
 
 ```sh
@@ -11,15 +15,24 @@ yarn plugin import https://raw.githubusercontent.com/RuBAN-GT/yarn-plugin-enhanc
 * `yarn workspaces graph` - prints monitored workspaces graph.
   * `-o, --output-format` can be `json` or `tree`
 * `yarn workspaces changed list` - prints changed workspaces with related chunks.
+  * `-a, --ancestors/--no-ancestors` - performs the operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
+  * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
+  * `--private/--no-private` - includes private workspaces into affected list. Default is `true`. More priority than `detectPrivates`.
+  * `--change-detection-strategy` - which source the plugin should use in order to determine workspaces changes. Can be `base-ref` or `prev-ref`. Default is `base-ref`. More priority than `changeDetectionStrategy`.
 * `yarn workspaces changed chunks` - prints changed workspaces in topological order grouped by chunks.
   * `-g, --group-by` the count of chunks, default is available machine cores
+  * `-a, --ancestors/--no-ancestors` - performs the operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
+  * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
+  * `--private/--no-private` - includes private workspaces into affected list. Default is `true`. More priority than `detectPrivates`.
+  * `--change-detection-strategy` - which source the plugin should use in order to determine workspaces changes. Can be `base-ref` or `prev-ref`. Default is `base-ref`. More priority than `changeDetectionStrategy`.
 * `yarn workspaces changed foreach` - a simple wrapper over `foreach` command working only with changed workspaces. Required to have installed `@yarnpkg/plugin-workspace-tools` plugin.
   * `--include` - a list of included workspaces
   * `--exclude` - a list of excluded workspaces
   * `-p, --parallel` - run the commands in parallel
-  * `-a, --ancestors/--no-ancestors` - perform operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
+  * `-a, --ancestors/--no-ancestors` - performs the operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
   * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
-  * `--private/--no-private` - include private workspaces into affected list. Default is `true`. More priority than `detectPrivates`.
+  * `--private/--no-private` - includes private workspaces into affected list. Default is `true`. More priority than `detectPrivates`.
+  * `--change-detection-strategy` - which source the plugin should use in order to determine workspaces changes. Can be `base-ref` or `prev-ref`. Default is `base-ref`. More priority than `changeDetectionStrategy`.
 
 ## Configuration
 
