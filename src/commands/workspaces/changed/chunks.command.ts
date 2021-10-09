@@ -6,6 +6,7 @@ import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { GroupManager, groupsJsonReportConverter } from '../../../core/group-manager';
 import { getMapValues } from '../../../utils/map.utils';
 import { getAvailableProcessesCount } from '../../../utils/system.utils';
+import { ChangeDetectionStrategy } from '../../../types/configuration';
 
 export class ChunksCommand extends Command<CommandContext> {
   // Meta
@@ -24,6 +25,18 @@ export class ChunksCommand extends Command<CommandContext> {
   public readonly groupManager: GroupManager = new GroupManager();
 
   // Commands
+  @Command.String('-s,--change-detection-strategy', { description: 'Change detection strategy' })
+  public changeDetectionStrategy?: ChangeDetectionStrategy;
+
+  @Command.Boolean('-a,--ancestors', { description: 'Perform operation over ancestors' })
+  public withAncestor: boolean = false;
+
+  @Command.Array('--ignored-ancestors-markers', { description: 'The same as ignoredAncestorsMarkers' })
+  public ignoredAncestorsMarkers: string[] = [];
+
+  @Command.Boolean('--private', { description: 'Include private workspaces' })
+  public withPrivate: boolean = true;
+
   @Command.Path('workspaces', 'changed', 'chunks')
   public async execute(): Promise<void> {
     this.validateInput();
@@ -31,7 +44,12 @@ export class ChunksCommand extends Command<CommandContext> {
     const configuration = await Configuration.find(this.context.cwd, this.context.plugins);
     const { project } = await Project.find(configuration, this.context.cwd);
 
-    const affectedNodes = await this.cdManager.findCandidates(project);
+    const affectedNodes = await this.cdManager.findCandidates(project, {
+      changeDetectionStrategy: this.changeDetectionStrategy,
+      withAncestor: this.withAncestor,
+      ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
+      withPrivate: this.withPrivate,
+    });
     const groups = this.groupManager.chunks({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });
 
     console.log(JSON.stringify(groupsJsonReportConverter(groups)));
