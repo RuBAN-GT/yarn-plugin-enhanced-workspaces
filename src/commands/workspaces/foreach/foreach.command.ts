@@ -32,6 +32,7 @@ export class ForeachCommand extends Command<CommandContext> {
   public withPrivate: boolean = Option.Boolean('--private', true, {
     description: 'Include private workspaces',
   });
+  public isParallel: boolean = Option.Boolean('-p,--parallel', false, { description: 'Run the commands in parallel' });
   public excludeList = Option.Array('--exclude', [], {
     description: 'Exclude specific workspaces',
   });
@@ -55,14 +56,13 @@ export class ForeachCommand extends Command<CommandContext> {
     }
 
     const commandList = ['workspaces', 'foreach', '-it', ...affectedList];
-    if (Option.Boolean('-p,--parallel', false, { description: 'Run the commands in parallel' })) {
+    if (this.isParallel) {
       commandList.push('--parallel');
     }
     await this.cli.run([...commandList, this.commandName, ...this.args]);
   }
 
   private async getAffectedList(project: Project): Promise<string[]> {
-    // Logic
     const affectedNodes = await this.cdManager.findCandidates(project, {
       changeDetectionStrategy: this.changeDetectionStrategy,
       withAncestor: this.withAncestors,

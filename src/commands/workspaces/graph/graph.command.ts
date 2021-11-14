@@ -40,7 +40,7 @@ export class GraphCommand extends Command<CommandContext> {
   private printTree(node: WorkspaceNode): void {
     switch (this.outputFormat) {
       case GraphOutputFormat.json: {
-        console.dir(JSON.stringify(treeNodeJsonConverter(node)));
+        console.log(JSON.stringify(treeNodeJsonConverter(node)));
         break;
       }
       case GraphOutputFormat.tree: {

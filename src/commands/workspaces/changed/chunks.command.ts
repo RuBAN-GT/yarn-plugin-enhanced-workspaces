@@ -1,7 +1,7 @@
 import { CommandContext, Project } from '@yarnpkg/core';
 import { Command, Option, Usage } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
-import { applyCascade, isPositive, isNumber, isEnum } from 'typanion';
+import { applyCascade, isAtLeast, isNumber, isEnum } from 'typanion';
 
 import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { GroupManager, groupsJsonReportConverter } from '../../../core/group-manager';
@@ -18,6 +18,11 @@ export class ChunksCommand extends Command<CommandContext> {
   });
 
   // Params
+  public groupBy = Option.String('-g,--group-by', getAvailableProcessesCount().toString(), {
+    description: 'Slice workspaces by this number, it should be positive number',
+    validator: applyCascade(isNumber(), [isAtLeast(1)]),
+  });
+
   public changeDetectionStrategy: ChangeDetectionStrategy = Option.String('-s,--change-detection-strategy', {
     description: 'Change detection strategy',
     validator: isEnum(ChangeDetectionStrategy),
@@ -40,11 +45,6 @@ export class ChunksCommand extends Command<CommandContext> {
   public readonly groupManager: GroupManager = new GroupManager();
 
   public async execute(): Promise<void> {
-    const groupBy = Option.String('-g,--group-by', getAvailableProcessesCount().toString(), {
-      description: 'Slice workspaces by this number, it should be positive number',
-      validator: applyCascade(isNumber(), [isPositive()]),
-    });
-
     const configuration = await Configuration.find(this.context.cwd, this.context.plugins);
     const { project } = await Project.find(configuration, this.context.cwd);
 
@@ -55,7 +55,7 @@ export class ChunksCommand extends Command<CommandContext> {
       withPrivate: this.withPrivate,
     });
 
-    const groups = this.groupManager.chunks({ groupBy: +groupBy, input: getMapValues(affectedNodes) });
+    const groups = this.groupManager.chunks({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });
     console.log(JSON.stringify(groupsJsonReportConverter(groups)));
   }
 }
