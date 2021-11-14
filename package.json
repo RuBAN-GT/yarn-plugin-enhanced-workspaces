@@ -1,6 +1,6 @@
 {
   "name": "yarn-plugin-enhanced-workspaces",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Yarn plugin enhancing workspaces commands",
   "author": "Dmitry Ruban @RuBAN-GT",
   "license": "MIT",
@@ -18,29 +18,29 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@yarnpkg/builder": "^2",
-    "@yarnpkg/core": "^2.4.0",
-    "@yarnpkg/fslib": "^2.5.0-rc.5",
-    "@yarnpkg/plugin-version": "^3.0.0-rc.5",
-    "clipanion": "^2.6.2",
+    "@yarnpkg/builder": "^3.1.0",
+    "@yarnpkg/core": "^3.1.0",
+    "@yarnpkg/fslib": "^2.6.0",
+    "@yarnpkg/plugin-version": "^3.1.0",
+    "clipanion": "^3.1.0",
     "tree-model": "^1.0.7",
     "treeify": "^1.1.0",
-    "tslib": "^2.3.0",
-    "typanion": "^3.3.1"
+    "tslib": "^2.3.1",
+    "typanion": "^3.7.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.2",
-    "@typescript-eslint/eslint-plugin": "^4.27.0",
-    "@typescript-eslint/parser": "^4.27.0",
-    "eslint": "^7.28.0",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "jest": "^27.0.4",
-    "nodemon": "^2.0.7",
-    "prettier": "^2.3.1",
-    "ts-jest": "^27.0.3",
-    "ts-node": "^10.0.0",
-    "typescript": "4.2.2"
+    "eslint-plugin-prettier": "^3.4.1",
+    "jest": "^27.3.1",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.4.1",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.4.0",
+    "typescript": "4.4.4"
   }
 }
