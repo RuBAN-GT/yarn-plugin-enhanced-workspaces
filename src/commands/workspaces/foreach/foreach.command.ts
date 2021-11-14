@@ -1,51 +1,48 @@
 import { CommandContext, Project } from '@yarnpkg/core';
-import { Command, Usage, UsageError } from 'clipanion';
+import { Command, Option, Usage, UsageError } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
+import { isEnum } from 'typanion';
 
 import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { WORKSPACE_PLUGIN_NAME } from './foreach.consts';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
 
 export class ForeachCommand extends Command<CommandContext> {
-  // Params
-  @Command.String()
-  public commandName!: string;
-
-  @Command.Proxy()
-  public args: string[] = [];
-
-  @Command.Boolean('--private', { description: 'Include private workspaces' })
-  public withPrivate: boolean = true;
-
-  @Command.Array('--exclude', { description: 'Exclude specific workspaces' })
-  public excludeList: string[] = [];
-
-  @Command.Array('--include', { description: 'Include specific workspaces' })
-  public includeList: string[] = [];
-
-  @Command.Boolean('-p,--parallel', { description: 'Run the commands in parallel' })
-  public isParallel: boolean = false;
-
-  @Command.Boolean('-a,--ancestors', { description: 'Perform operation over ancestors' })
-  public withAncestor: boolean = false;
-
-  @Command.Array('--ignored-ancestors-markers', { description: 'The same as ignoredAncestorsMarkers' })
-  public ignoredAncestorsMarkers: string[] = [];
-
-  @Command.String('-s,--change-detection-strategy', { description: 'Change detection strategy' })
-  public changeDetectionStrategy?: ChangeDetectionStrategy;
-
   // Meta
+  public static paths: string[][] = [['workspaces', 'changed', 'foreach']];
   public static usage: Usage = Command.Usage({
     category: 'Workspace-related commands',
     description: `A wrapper over foreach with -it options helping to invoke operations for changed workspaces. Required to have installed ${WORKSPACE_PLUGIN_NAME} plugin.`,
   });
 
+  // Params
+  public commandName: string = Option.String();
+  public args: string[] = Option.Proxy() || [];
+
+  public changeDetectionStrategy: ChangeDetectionStrategy = Option.String('-s,--change-detection-strategy', {
+    description: 'Change detection strategy',
+    validator: isEnum(ChangeDetectionStrategy),
+  }) as any;
+  public withAncestors: boolean = Option.Boolean('-a,--ancestors', false, {
+    description: 'Perform operation over ancestors',
+  });
+  public ignoredAncestorsMarkers: string[] = Option.Array('--ignored-ancestors-markers', [], {
+    description: 'The same as ignoredAncestorsMarkers',
+  });
+  public withPrivate: boolean = Option.Boolean('--private', true, {
+    description: 'Include private workspaces',
+  });
+  public isParallel: boolean = Option.Boolean('-p,--parallel', false, { description: 'Run the commands in parallel' });
+  public excludeList = Option.Array('--exclude', [], {
+    description: 'Exclude specific workspaces',
+  });
+  public includeList = Option.Array('--include', [], {
+    description: 'Include specific workspaces',
+  });
+
   // Dependencies
   public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
 
-  // Commands
-  @Command.Path('workspaces', 'changed', 'foreach')
   public async execute(): Promise<void> {
     const config = await Configuration.find(this.context.cwd, this.context.plugins);
     const { project } = await Project.find(config, this.context.cwd);
@@ -68,7 +65,7 @@ export class ForeachCommand extends Command<CommandContext> {
   private async getAffectedList(project: Project): Promise<string[]> {
     const affectedNodes = await this.cdManager.findCandidates(project, {
       changeDetectionStrategy: this.changeDetectionStrategy,
-      withAncestor: this.withAncestor,
+      withAncestor: this.withAncestors,
       ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
       withPrivate: this.withPrivate,
     });

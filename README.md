@@ -2,7 +2,7 @@
 
 ## Requirements
 
-**This plugin is only supported on Yarn V2, V3 compatible version will be soon.**
+**This plugin is only supported on Yarn V3 compatible version will be soon.**
 
 ## Install
 
