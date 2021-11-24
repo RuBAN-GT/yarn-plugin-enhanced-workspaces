@@ -22,6 +22,16 @@ export abstract class BasicNode<Id = string> implements TreeNode<Id> {
     return this;
   }
 
+  public hasChildren(node: BasicNode<Id>): boolean {
+    return this.children.some((child) => child.id === node.id);
+  }
+
+  public hasDeepChildren(node: BasicNode<Id>): boolean {
+    return node.children.some((child) => {
+      return child.id === node.id || child.hasDeepChildren(node);
+    });
+  }
+
   protected generateChain(): void {
     this._chain = new Set(this.parent?.chain);
     this._chain.add(this.id);

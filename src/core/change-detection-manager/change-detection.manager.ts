@@ -46,15 +46,15 @@ export class ChangeDetectionManager {
     const nodes = this.findAffectedNodes(treeManager, affectedWorkspaces);
 
     withAncestor = withAncestor === undefined ? configuration.get('preserveAncestors') : withAncestor;
-    if (withAncestor) {
-      ignoredAncestorsMarkers = ignoredAncestorsMarkers || [];
-      const configMarkers = configuration.get('ignoredAncestorsMarkers') || [];
-      const result = this.mixAncestorsNodes(treeManager, nodes, ignoredAncestorsMarkers.concat(configMarkers));
-      result.delete(rootNode.workspace.locator);
-      return result;
-    } else {
+    if (!withAncestor) {
       return nodes;
     }
+
+    ignoredAncestorsMarkers = ignoredAncestorsMarkers || [];
+    const configMarkers = configuration.get('ignoredAncestorsMarkers') || [];
+    const result = this.mixAncestorsNodes(treeManager, nodes, ignoredAncestorsMarkers.concat(configMarkers));
+    result.delete(rootNode.workspace.locator);
+    return result;
   }
 
   protected async findAffectedWorkspaces(

@@ -14,9 +14,7 @@ export class WorkspaceTreeManager {
   }
 
   public findAllParents(node: WorkspaceNode): WorkspaceNode[] {
-    return this.tree
-      .all(({ model }) => node.chain.has(model.id) || model.children.some((c: WorkspaceNode) => c.id === node.id))
-      .map((node) => node.model);
+    return this.tree.all(({ model }) => node.chain.has(model.id) || model.hasChildren(node)).map((node) => node.model);
   }
 
   public findNodesByIds(ids: Set<Locator>): WorkspaceNode[] {
@@ -24,10 +22,7 @@ export class WorkspaceTreeManager {
   }
 
   public findNodesByWorkspaces(workspaces: Workspace[]): WorkspaceNode[] {
-    const nodes = this.tree.all(({ model }) => {
-      return workspaces.includes(model.workspace);
-    });
-    return nodes.map((node) => node.model);
+    return this.tree.all(({ model }) => workspaces.includes(model.workspace)).map((node) => node.model);
   }
 
   protected parseWorkspaceNode(rootNode: WorkspaceNode): Node<WorkspaceNode> {
