@@ -93,7 +93,7 @@ export class ChangeDetectionManager {
   ): CandidatesMap {
     const fullNodes: CandidatesMap = new Map();
     nodes.forEach((node) => {
-      treeManager.findNodesByIds(node.chain).forEach((bread) => {
+      treeManager.findAllParents(node).forEach((bread) => {
         if (nodes.has(bread.workspace.locator) || !markersAreAvailable(bread, ignoredMarkers)) {
           fullNodes.set(bread.workspace.locator, bread);
         }

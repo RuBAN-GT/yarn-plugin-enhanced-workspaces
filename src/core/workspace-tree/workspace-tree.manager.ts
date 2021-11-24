@@ -13,6 +13,12 @@ export class WorkspaceTreeManager {
     this.tree = this.parseWorkspaceNode(root);
   }
 
+  public findAllParents(node: WorkspaceNode): WorkspaceNode[] {
+    return this.tree
+      .all(({ model }) => node.chain.has(model.id) || model.children.some((c: WorkspaceNode) => c.id === node.id))
+      .map((node) => node.model);
+  }
+
   public findNodesByIds(ids: Set<Locator>): WorkspaceNode[] {
     return this.tree.all(({ model }) => ids.has(model.id)).map((node) => node.model);
   }

@@ -71,7 +71,7 @@ export class ForeachCommand extends Command<CommandContext> {
 
     const chunks = this.groupManager.chunks({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });
     for await (const chunk of chunks.data) {
-      console.log(`Execute operation over group: `, chunk.map((n) => n.name).join(', '));
+      console.log(`▶ Execute operation over group: `, chunk.map((n) => n.name).join(', '));
       await this.executeCommandOverNodes(chunk);
     }
   }
@@ -95,8 +95,6 @@ export class ForeachCommand extends Command<CommandContext> {
 
       return acc;
     }, [] as string[]);
-
-    console.dir(`Execute the group: ${includeList}`);
 
     await this.cli.run([...defaultCommandList, ...includeList, this.commandName, ...this.args]);
   }
