@@ -1,15 +1,15 @@
 import { TreeNode } from '../workspace-tree';
 
-export type GroupRankMap = Map<TreeNode, number>;
+export type GroupRankMap<T = any> = Map<TreeNode<T>, number>;
 
-export interface GroupManagerProps {
+export interface GroupManagerProps<T = any> {
   groupBy: number;
-  input: TreeNode[];
+  input: TreeNode<T>[];
 }
 
-export interface GroupsChunks {
+export interface GroupsChunks<T = any> {
   groupBy: number;
-  data: TreeNode[][];
+  data: TreeNode<T>[][];
 }
 
 export interface GroupsChunksJson {
