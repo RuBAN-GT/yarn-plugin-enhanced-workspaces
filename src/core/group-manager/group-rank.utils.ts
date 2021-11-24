@@ -6,3 +6,10 @@ export function findNearestParentRank(rankMap: GroupRankMap, sample: TreeNode): 
   const nearestNode = findNearestParentNode(sample, [...getMapKeys(rankMap)]);
   return nearestNode ? [rankMap.get(nearestNode) as number, nearestNode] : [0, undefined];
 }
+
+export function sortPrerankedTreeNodes(nodes: TreeNode[]): TreeNode[] {
+  return nodes.sort((a, b) => {
+    const sortField = a.depth === b.depth ? 'name' : 'depth';
+    return a[sortField] > b[sortField] ? 1 : -1;
+  });
+}

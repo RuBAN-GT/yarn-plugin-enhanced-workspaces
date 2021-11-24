@@ -1,11 +1,11 @@
 import { TreeNode } from '../workspace-tree';
 import { GroupRankMap } from './group-manager.types';
-import { findNearestParentRank } from './group-rank.utils';
+import { findNearestParentRank, sortPrerankedTreeNodes } from './group-rank.utils';
 
 export class GroupRankResolver {
   public resolve(nodes: TreeNode[]): GroupRankMap {
     const rankMap: GroupRankMap = new Map();
-    this.fillSourceFragment(rankMap, nodes);
+    this.fillSourceFragment(rankMap, sortPrerankedTreeNodes(nodes));
 
     return rankMap;
   }

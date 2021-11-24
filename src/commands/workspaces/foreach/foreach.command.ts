@@ -1,11 +1,15 @@
 import { CommandContext, Project } from '@yarnpkg/core';
 import { Command, Option, Usage, UsageError } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
-import { isEnum } from 'typanion';
+import { applyCascade, isAtLeast, isEnum, isNumber } from 'typanion';
 
 import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { WORKSPACE_PLUGIN_NAME } from './foreach.consts';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
+import { getAvailableProcessesCount } from '../../../utils/system.utils';
+import { GroupManager } from '../../../core/group-manager';
+import { getMapValues } from '../../../utils/map.utils';
+import { TreeNode } from '../../../core/workspace-tree';
 
 export class ForeachCommand extends Command<CommandContext> {
   // Meta
@@ -33,6 +37,10 @@ export class ForeachCommand extends Command<CommandContext> {
     description: 'Include private workspaces',
   });
   public isParallel: boolean = Option.Boolean('-p,--parallel', false, { description: 'Run the commands in parallel' });
+  public groupBy = Option.String('-g,--group-by', getAvailableProcessesCount().toString(), {
+    description: 'Slice workspaces by this number, it should be positive number',
+    validator: applyCascade(isNumber(), [isAtLeast(1)]),
+  });
   public excludeList = Option.Array('--exclude', [], {
     description: 'Exclude specific workspaces',
   });
@@ -42,6 +50,7 @@ export class ForeachCommand extends Command<CommandContext> {
 
   // Dependencies
   public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
+  public readonly groupManager: GroupManager = new GroupManager();
 
   public async execute(): Promise<void> {
     const config = await Configuration.find(this.context.cwd, this.context.plugins);
@@ -49,40 +58,47 @@ export class ForeachCommand extends Command<CommandContext> {
 
     this.validate(config);
 
-    const affectedList: string[] = await this.getAffectedList(project);
-    if (affectedList.length === 0) {
-      console.dir('No affected workspaces.');
-      return;
-    }
-
-    const commandList = ['workspaces', 'foreach', '-it', ...affectedList];
-    if (this.isParallel) {
-      commandList.push('--parallel');
-    }
-    await this.cli.run([...commandList, this.commandName, ...this.args]);
-  }
-
-  private async getAffectedList(project: Project): Promise<string[]> {
     const affectedNodes = await this.cdManager.findCandidates(project, {
       changeDetectionStrategy: this.changeDetectionStrategy,
       withAncestor: this.withAncestors,
       ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
       withPrivate: this.withPrivate,
     });
-    const affectedList: string[] = [];
-    affectedNodes.forEach((node) => {
+    if (affectedNodes.size === 0) {
+      console.dir('No affected workspaces.');
+      return;
+    }
+
+    const chunks = this.groupManager.chunks({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });
+    for await (const chunk of chunks.data) {
+      console.log(`Execute operation over group: `, chunk.map((n) => n.name).join(', '));
+      await this.executeCommandOverNodes(chunk);
+    }
+  }
+
+  private async executeCommandOverNodes(nodes: TreeNode[]): Promise<void> {
+    const defaultCommandList = ['workspaces', 'foreach', '-it'];
+    if (this.isParallel) {
+      defaultCommandList.push('--parallel');
+    }
+
+    const includeList = nodes.reduce((acc, node) => {
       if (
         this.excludeList.includes(node.name) ||
         (this.includeList.length > 0 && !this.includeList.includes(node.name))
       ) {
-        return;
+        return acc;
       }
 
-      affectedList.push('--include');
-      affectedList.push(node.name);
-    });
+      acc.push('--include');
+      acc.push(node.name);
 
-    return affectedList;
+      return acc;
+    }, [] as string[]);
+
+    console.dir(`Execute the group: ${includeList}`);
+
+    await this.cli.run([...defaultCommandList, ...includeList, this.commandName, ...this.args]);
   }
 
   private validate(config: Configuration): void {
