@@ -88,5 +88,27 @@ describe('GroupRankResolver', () => {
       expect(rankMap.get(d)).toBe(1);
       expect(rankMap.get(e)).toBe(1);
     });
+
+    it('generates ranked map without affection of unordered list', () => {
+      // Preset
+      const a = new SampleNode('a');
+      const b = new SampleNode('a.b', a);
+      const c = new SampleNode('a.b.c', b);
+      const d = new SampleNode('a.b.c.d', c);
+      const e = new SampleNode('a.b.c.e', c);
+      a.addChildren(b);
+      b.addChildren(c);
+      c.addChildren(d).addChildren(e);
+
+      // Setup
+      const nodes = [e, d, b];
+      const rankMap = rankResolver.resolve(nodes);
+
+      // Test it
+      expect(rankMap.size).toBe(nodes.length);
+      expect(rankMap.get(b)).toBe(0);
+      expect(rankMap.get(d)).toBe(1);
+      expect(rankMap.get(e)).toBe(1);
+    });
   });
 });

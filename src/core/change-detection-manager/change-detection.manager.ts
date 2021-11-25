@@ -46,15 +46,15 @@ export class ChangeDetectionManager {
     const nodes = this.findAffectedNodes(treeManager, affectedWorkspaces);
 
     withAncestor = withAncestor === undefined ? configuration.get('preserveAncestors') : withAncestor;
-    if (withAncestor) {
-      ignoredAncestorsMarkers = ignoredAncestorsMarkers || [];
-      const configMarkers = configuration.get('ignoredAncestorsMarkers') || [];
-      const result = this.mixAncestorsNodes(treeManager, nodes, ignoredAncestorsMarkers.concat(configMarkers));
-      result.delete(rootNode.workspace.locator);
-      return result;
-    } else {
+    if (!withAncestor) {
       return nodes;
     }
+
+    ignoredAncestorsMarkers = ignoredAncestorsMarkers || [];
+    const configMarkers = configuration.get('ignoredAncestorsMarkers') || [];
+    const result = this.mixAncestorsNodes(treeManager, nodes, ignoredAncestorsMarkers.concat(configMarkers));
+    result.delete(rootNode.workspace.locator);
+    return result;
   }
 
   protected async findAffectedWorkspaces(
@@ -93,7 +93,7 @@ export class ChangeDetectionManager {
   ): CandidatesMap {
     const fullNodes: CandidatesMap = new Map();
     nodes.forEach((node) => {
-      treeManager.findNodesByIds(node.chain).forEach((bread) => {
+      treeManager.findAllParents(node).forEach((bread) => {
         if (nodes.has(bread.workspace.locator) || !markersAreAvailable(bread, ignoredMarkers)) {
           fullNodes.set(bread.workspace.locator, bread);
         }

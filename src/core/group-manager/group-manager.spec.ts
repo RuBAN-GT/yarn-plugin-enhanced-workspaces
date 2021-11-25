@@ -16,6 +16,7 @@ describe('GroupManager', () => {
       b.addChildren(c);
       c.addChildren(d).addChildren(e);
 
+      // Test it
       const props = { groupBy: 2, input: [b, d, e] };
       const report = groupManager.chunks(props);
 
@@ -37,6 +38,7 @@ describe('GroupManager', () => {
       b.addChildren(c);
       c.addChildren(d).addChildren(e);
 
+      // Test it
       const props = { groupBy: 1, input: [b, d, e] };
       const report = groupManager.chunks(props);
 
