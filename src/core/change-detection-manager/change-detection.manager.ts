@@ -63,6 +63,8 @@ export class ChangeDetectionManager {
   ): Promise<Set<Workspace>> {
     if (!project.configuration.projectCwd) {
       throw new UsageError('Invalid project configuration.');
+    } else if (changeDetectionStrategy === ChangeDetectionStrategy.none) {
+      return new Set(project.workspaces);
     }
 
     const anchorHash = await refDetectorResolver(project, changeDetectionStrategy);
