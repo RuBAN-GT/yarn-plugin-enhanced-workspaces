@@ -1,6 +1,7 @@
 export enum ChangeDetectionStrategy {
   baseRef = 'base-ref',
   prevRef = 'prev-ref',
+  none = 'none',
 }
 
 declare module '@yarnpkg/core' {
