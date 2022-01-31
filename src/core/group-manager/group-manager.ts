@@ -1,5 +1,4 @@
-import { chunkBy } from '../../utils/array.utils';
-import { getInvertedMap } from '../../utils/map.utils';
+import { chunkBy, getInvertedMap } from '../../utils';
 import { TreeNode } from '../workspace-tree';
 import { GroupManagerProps, GroupsChunks } from './group-manager.types';
 import { GroupRankResolver } from './group-rank.resolver';
