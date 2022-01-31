@@ -31,6 +31,8 @@ Thumbs.db
 
 # Ignore built ts files
 dist/**/*
+lib/**/*
+*.tgz
 
 # yarn
 .yarn/cache
