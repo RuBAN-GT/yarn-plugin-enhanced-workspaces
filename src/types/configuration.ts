@@ -10,5 +10,6 @@ declare module '@yarnpkg/core' {
     detectPrivates: boolean;
     ignoredAncestorsMarkers: string[];
     preserveAncestors: boolean;
+    extraWorkspaces: string[];
   }
 }

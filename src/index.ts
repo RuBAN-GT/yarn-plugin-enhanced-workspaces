@@ -33,6 +33,13 @@ const plugin: Plugin = {
       isNullable: false,
       default: false,
     },
+    extraWorkspaces: {
+      description: 'List of additional workspaces outside change detection gathering.',
+      type: SettingsType.STRING,
+      isNullable: false,
+      isArray: true,
+      default: [],
+    },
   },
   commands: [GraphCommand, ChunksCommand, ListCommand, ForeachCommand],
 };

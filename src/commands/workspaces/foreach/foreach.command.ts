@@ -35,15 +35,18 @@ export class ForeachCommand extends Command<CommandContext> {
     description: 'Include private workspaces',
   });
   public isParallel: boolean = Option.Boolean('-p,--parallel', false, { description: 'Run the commands in parallel' });
-  public groupBy = Option.String('-g,--group-by', getAvailableProcessesCount().toString(), {
+  public groupBy: number = Option.String('-g,--group-by', getAvailableProcessesCount().toString(), {
     description: 'Slice workspaces by this number, it should be positive number',
     validator: applyCascade(isNumber(), [isAtLeast(1)]),
   });
-  public excludeList = Option.Array('--exclude', [], {
+  public excludeList: string[] = Option.Array('--exclude', [], {
     description: 'Exclude specific workspaces',
   });
-  public includeList = Option.Array('--include', [], {
+  public includeList: string[] = Option.Array('--include', [], {
     description: 'Include specific workspaces',
+  });
+  public extraList: string[] = Option.Array('--extra', [], {
+    description: 'Add specific workspaces without change detection',
   });
 
   // Dependencies
@@ -71,6 +74,7 @@ export class ForeachCommand extends Command<CommandContext> {
       withAncestor: this.withAncestors,
       ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
       withPrivate: this.withPrivate,
+      extra: this.extraList,
     });
     const requestedNodes = getMapValues(affectedNodes).filter((node) => {
       return !(

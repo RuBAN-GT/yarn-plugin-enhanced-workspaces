@@ -15,11 +15,13 @@ yarn plugin import https://raw.githubusercontent.com/RuBAN-GT/yarn-plugin-enhanc
 * `yarn workspaces graph` - prints monitored workspaces graph.
   * `-o, --output-format` can be `json` or `tree`
 * `yarn workspaces changed list` - prints changed workspaces with related chunks.
+  * `--extra` - a list of additional workspaces outside change detection gathering
   * `-a, --ancestors/--no-ancestors` - performs the operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
   * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
   * `--private/--no-private` - includes private workspaces into affected list. Default is `true`. More priority than `detectPrivates`.
   * `--change-detection-strategy` - which source the plugin should use in order to determine workspaces changes. Can be `base-ref`, `prev-ref` or `none`. Default is `base-ref`. More priority than `changeDetectionStrategy`.
 * `yarn workspaces changed chunks` - prints changed workspaces in topological order grouped by chunks.
+  * `--extra` - a list of additional workspaces outside change detection gathering
   * `-g, --group-by` the count of chunks, default is available machine cores
   * `-a, --ancestors/--no-ancestors` - performs the operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
   * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
@@ -28,6 +30,7 @@ yarn plugin import https://raw.githubusercontent.com/RuBAN-GT/yarn-plugin-enhanc
 * `yarn workspaces changed foreach` - a simple wrapper over `foreach` command working only with changed workspaces. Required to have installed `@yarnpkg/plugin-workspace-tools` plugin.
   * `--include` - a list of included workspaces
   * `--exclude` - a list of excluded workspaces
+  * `--extra` - a list of additional workspaces outside change detection gathering
   * `-p, --parallel` - run the commands in parallel
   * `-a, --ancestors/--no-ancestors` - performs the operation over ancestors. Default is `false`. More priority than `preserveAncestors`.
   * `--ignored-ancestors-markers` - the same as `ignoredAncestorsMarkers`
@@ -42,6 +45,7 @@ The plugin provides the next configurable options:
 * `ignoredAncestorsMarkers` - If ancestor workspace contains these files/directories it will be excluded from execution list. Should be defined a string list.
 * `preserveAncestors` - Preserve ancestors of changed workspaces. Should be defined as a boolean flag. Default is `false`.
 * `detectPrivates` - Gather private workspaces into changed list. Should be defined as a boolean flag. Default is `true`.
+* `extraWorkspaces` - a list of additional workspaces outside change detection gathering. Default is empty list.
 
 ## About change detection strategies
 

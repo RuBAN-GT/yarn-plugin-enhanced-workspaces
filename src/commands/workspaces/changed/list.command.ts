@@ -34,6 +34,10 @@ export class ListCommand extends Command<CommandContext> {
     description: 'Include private workspaces',
   });
 
+  public extraList: string[] = Option.Array('--extra', [], {
+    description: 'Add specific workspaces without change detection',
+  });
+
   // Dependencies
   public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
   public readonly groupManager: GroupManager = new GroupManager();
@@ -47,6 +51,7 @@ export class ListCommand extends Command<CommandContext> {
       withAncestor: this.withAncestors,
       ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
       withPrivate: this.withPrivate,
+      extra: this.extraList,
     });
 
     const nodesList = this.groupManager.list(getMapValues(affectedNodes)).map((node) => {
