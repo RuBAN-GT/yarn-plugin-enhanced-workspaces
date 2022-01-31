@@ -5,7 +5,7 @@ import { isEnum } from 'typanion';
 
 import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { GroupManager } from '../../../core/group-manager';
-import { getMapValues } from '../../../utils/map.utils';
+import { getMapValues } from '../../../utils';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
 
 export class ListCommand extends Command<CommandContext> {

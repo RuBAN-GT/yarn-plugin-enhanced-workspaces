@@ -5,8 +5,7 @@ import { applyCascade, isAtLeast, isNumber, isEnum } from 'typanion';
 
 import { ChangeDetectionManager } from '../../../core/change-detection-manager';
 import { GroupManager, groupsJsonReportConverter } from '../../../core/group-manager';
-import { getMapValues } from '../../../utils/map.utils';
-import { getAvailableProcessesCount } from '../../../utils/system.utils';
+import { getMapValues, getAvailableProcessesCount } from '../../../utils';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
 
 export class ChunksCommand extends Command<CommandContext> {

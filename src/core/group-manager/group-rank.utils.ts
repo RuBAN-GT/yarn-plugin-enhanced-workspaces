@@ -1,4 +1,4 @@
-import { getMapKeys } from '../../utils/map.utils';
+import { getMapKeys } from '../../utils';
 import { TreeNode } from '../workspace-tree';
 import { GroupRankMap } from './group-manager.types';
 

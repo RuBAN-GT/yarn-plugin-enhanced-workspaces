@@ -4,9 +4,10 @@ import { Configuration } from '@yarnpkg/core';
 import { applyCascade, isAtLeast, isEnum, isNumber } from 'typanion';
 
 import { ChangeDetectionManager } from '../../../core/change-detection-manager';
+import { GroupManager, GroupsChunks } from '../../../core/group-manager';
 import { WORKSPACE_PLUGIN_NAME } from './foreach.consts';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
-import { getAvailableProcessesCount } from '../../../utils/system.utils';
+import { getMapValues, getAvailableProcessesCount } from '../../../utils';
 
 export class ForeachCommand extends Command<CommandContext> {
   // Meta
@@ -47,6 +48,7 @@ export class ForeachCommand extends Command<CommandContext> {
 
   // Dependencies
   public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
+  public readonly groupManager: GroupManager = new GroupManager();
 
   public async execute(): Promise<void> {
     const config = await Configuration.find(this.context.cwd, this.context.plugins);
@@ -54,40 +56,45 @@ export class ForeachCommand extends Command<CommandContext> {
 
     this.validate(config);
 
-    const affectedList: string[] = await this.getAffectedList(project);
-    if (affectedList.length === 0) {
+    const groups = await this.getGroups(project);
+    if (groups.data.length === 0) {
       console.dir('No affected workspaces.');
       return;
     }
 
-    const commandList = ['workspaces', 'foreach', '-it', '--topological-dev', ...affectedList];
-    if (this.isParallel) {
-      commandList.push('--parallel');
-    }
-    await this.cli.run([...commandList, this.commandName, ...this.args]);
+    await this.executeGroups(groups);
   }
 
-  private async getAffectedList(project: Project): Promise<string[]> {
+  private async getGroups(project: Project): Promise<GroupsChunks<any>> {
     const affectedNodes = await this.cdManager.findCandidates(project, {
       changeDetectionStrategy: this.changeDetectionStrategy,
       withAncestor: this.withAncestors,
       ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
       withPrivate: this.withPrivate,
     });
-    const affectedList: string[] = [];
-    affectedNodes.forEach((node) => {
-      if (
+    const requestedNodes = getMapValues(affectedNodes).filter((node) => {
+      return !(
         this.excludeList.includes(node.name) ||
         (this.includeList.length > 0 && !this.includeList.includes(node.name))
-      ) {
-        return;
-      }
-
-      affectedList.push('--include');
-      affectedList.push(node.name);
+      );
     });
 
-    return affectedList;
+    return this.groupManager.chunks({ groupBy: +this.groupBy, input: requestedNodes });
+  }
+
+  private async executeGroups(groups: GroupsChunks<any>): Promise<void> {
+    const commandList = ['workspaces', 'foreach', '-i', '--topological-dev'];
+    if (this.isParallel) {
+      commandList.push('--parallel');
+    }
+
+    for await (const group of groups.data) {
+      const groupNames = group.map((node) => node.name);
+      const nodesList = groupNames.reduce((acc: string[], node) => [...acc, '--include', node], []);
+
+      console.dir(`Execute '${this.args.join(' ')}' command over ${groupNames.join(', ')}`);
+      await this.cli.run([...commandList, ...nodesList, this.commandName, ...this.args]);
+    }
   }
 
   private validate(config: Configuration): void {
