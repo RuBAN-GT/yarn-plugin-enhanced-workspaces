@@ -17,7 +17,7 @@ export class ChunksCommand extends Command<CommandContext> {
   });
 
   // Params
-  public groupBy = Option.String('-g,--group-by', getAvailableProcessesCount().toString(), {
+  public groupBy: number = Option.String('-g,--group-by', getAvailableProcessesCount().toString(), {
     description: 'Slice workspaces by this number, it should be positive number',
     validator: applyCascade(isNumber(), [isAtLeast(1)]),
   });
@@ -39,6 +39,10 @@ export class ChunksCommand extends Command<CommandContext> {
     description: 'Include private workspaces',
   });
 
+  public extraList: string[] = Option.Array('--extra', [], {
+    description: 'Add specific workspaces without change detection',
+  });
+
   // Dependencies
   public readonly cdManager: ChangeDetectionManager = new ChangeDetectionManager();
   public readonly groupManager: GroupManager = new GroupManager();
@@ -52,6 +56,7 @@ export class ChunksCommand extends Command<CommandContext> {
       withAncestor: this.withAncestors,
       ignoredAncestorsMarkers: this.ignoredAncestorsMarkers,
       withPrivate: this.withPrivate,
+      extra: this.extraList,
     });
 
     const groups = this.groupManager.chunks({ groupBy: +this.groupBy, input: getMapValues(affectedNodes) });

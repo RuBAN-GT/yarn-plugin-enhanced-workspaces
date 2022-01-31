@@ -23,7 +23,8 @@ export class ChangeDetectionManager {
    */
   public async findCandidates(project: Project, options: ChangeDetectionOptions = {}): Promise<CandidatesMap> {
     const { topLevelWorkspace, configuration } = project;
-    let { ignoredAncestorsMarkers, withAncestor, withPrivate } = options;
+    let { withAncestor, withPrivate } = options;
+    const { extra = [], ignoredAncestorsMarkers = [] } = options;
 
     const changedWorkspaces = await this.findAffectedWorkspaces(project, options.changeDetectionStrategy);
 
@@ -36,6 +37,18 @@ export class ChangeDetectionManager {
         return !workspace.manifest.private || withPrivate;
       }
     });
+
+    // Add extra workspaces
+    const additionalList = extra.concat(configuration.get('extraWorkspaces'));
+    if (additionalList.length > 0) {
+      project.workspaces.forEach((workspace) => {
+        if (additionalList.includes(workspace.manifest.raw.name) && !affectedWorkspaces.includes(workspace)) {
+          affectedWorkspaces.push(workspace);
+        }
+      });
+    }
+
+    // Check empty list
     if (affectedWorkspaces.length === 0) {
       return new Map();
     }
@@ -45,12 +58,12 @@ export class ChangeDetectionManager {
     const treeManager = new WorkspaceTreeManager(rootNode);
     const nodes = this.findAffectedNodes(treeManager, affectedWorkspaces);
 
+    // Calculate ancestors
     withAncestor = withAncestor === undefined ? configuration.get('preserveAncestors') : withAncestor;
     if (!withAncestor) {
       return nodes;
     }
 
-    ignoredAncestorsMarkers = ignoredAncestorsMarkers || [];
     const configMarkers = configuration.get('ignoredAncestorsMarkers') || [];
     const result = this.mixAncestorsNodes(treeManager, nodes, ignoredAncestorsMarkers.concat(configMarkers));
     result.delete(rootNode.workspace.locator);
