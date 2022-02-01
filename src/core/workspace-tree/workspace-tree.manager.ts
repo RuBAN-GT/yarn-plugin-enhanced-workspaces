@@ -1,7 +1,8 @@
 import { Workspace, Locator } from '@yarnpkg/core';
-import TreeModel, { Node } from 'tree-model';
+import { Node } from 'tree-model';
 
 import { WorkspaceNode } from './models/workspace.node';
+import TreeModel from './tree.utils';
 
 export class WorkspaceTreeManager {
   public readonly root: WorkspaceNode;
@@ -26,7 +27,6 @@ export class WorkspaceTreeManager {
   }
 
   protected parseWorkspaceNode(rootNode: WorkspaceNode): Node<WorkspaceNode> {
-    const treeManager = new TreeModel();
-    return treeManager.parse(rootNode);
+    return new TreeModel().parse(rootNode);
   }
 }

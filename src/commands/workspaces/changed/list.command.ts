@@ -1,5 +1,6 @@
-import { CommandContext, Project } from '@yarnpkg/core';
+import { Project } from '@yarnpkg/core';
 import { Command, Option, Usage } from 'clipanion';
+import { BaseCommand } from '@yarnpkg/cli';
 import { Configuration } from '@yarnpkg/core';
 import { isEnum } from 'typanion';
 
@@ -8,7 +9,7 @@ import { GroupManager } from '../../../core/group-manager';
 import { getMapValues } from '../../../utils';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
 
-export class ListCommand extends Command<CommandContext> {
+export class ListCommand extends BaseCommand {
   // Meta
   public static paths: string[][] = [['workspaces', 'changed', 'list']];
   public static usage: Usage = Command.Usage({

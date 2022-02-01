@@ -1,5 +1,6 @@
-import { CommandContext, Project } from '@yarnpkg/core';
+import { Project } from '@yarnpkg/core';
 import { Command, Option, Usage, UsageError } from 'clipanion';
+import { BaseCommand } from '@yarnpkg/cli';
 import { Configuration } from '@yarnpkg/core';
 import { applyCascade, isAtLeast, isEnum, isNumber } from 'typanion';
 
@@ -9,7 +10,7 @@ import { WORKSPACE_PLUGIN_NAME } from './foreach.consts';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
 import { getMapValues, getAvailableProcessesCount } from '../../../utils';
 
-export class ForeachCommand extends Command<CommandContext> {
+export class ForeachCommand extends BaseCommand {
   // Meta
   public static paths: string[][] = [['workspaces', 'changed', 'foreach']];
   public static usage: Usage = Command.Usage({

@@ -19,12 +19,13 @@
     "build": "builder build plugin",
     "build:watch": "nodemon --watch src -e ts --exec builder build plugin",
     "prepack": "tsc",
-    "publish": "run prepack && yarn npm publish",
+    "publish": "run build && run prepack && yarn npm publish",
     "test": "jest",
     "test:watch": "jest --watch"
   },
   "dependencies": {
     "@yarnpkg/builder": "^3.1.0",
+    "@yarnpkg/cli": "^3.1.0",
     "@yarnpkg/core": "^3.1.0",
     "@yarnpkg/fslib": "^2.6.0",
     "@yarnpkg/plugin-version": "^3.1.0",
