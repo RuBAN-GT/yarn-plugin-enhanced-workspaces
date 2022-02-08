@@ -14,7 +14,7 @@ export async function findChangedFiles(
   commitHash?: string | undefined | null,
 ): Promise<PortablePath[]> {
   const root = project.configuration.projectCwd as PortablePath;
-  const excludedList: string[] = project.configuration.get('changesetIgnorePatterns') || [];
+  const excludedList: string[] = (project.configuration.get('changesetIgnorePatterns') as string[]) || [];
   const options = { cwd: root, strict: true };
 
   // Get tracked files

@@ -1,4 +1,5 @@
-import { CommandContext, Project } from '@yarnpkg/core';
+import { Project } from '@yarnpkg/core';
+import { BaseCommand } from '@yarnpkg/cli';
 import { Command, Option, Usage } from 'clipanion';
 import { Configuration } from '@yarnpkg/core';
 import { asTree } from 'treeify';
@@ -12,7 +13,7 @@ import {
   WorkspaceNode,
 } from '../../../core/workspace-tree';
 
-export class GraphCommand extends Command<CommandContext> {
+export class GraphCommand extends BaseCommand {
   // Meta
   public static paths: string[][] = [['workspaces', 'graph']];
   public static usage: Usage = Command.Usage({

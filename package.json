@@ -1,24 +1,31 @@
 {
   "name": "yarn-plugin-enhanced-workspaces",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Yarn plugin enhancing workspaces commands",
   "author": "Dmitry Ruban @RuBAN-GT",
   "license": "MIT",
   "main": "./src/index.ts",
+  "publishConfig": {
+    "main": "./lib/index.js",
+    "typings": "./lib/index.d.ts"
+  },
   "files": [
     "bundles",
-    "src",
+    "lib",
     "README.md"
   ],
   "scripts": {
     "lint": "eslint . --ext .ts --config .eslintrc.js",
     "build": "builder build plugin",
     "build:watch": "nodemon --watch src -e ts --exec builder build plugin",
+    "prepack": "tsc",
+    "publish": "run build && run prepack && yarn npm publish",
     "test": "jest",
     "test:watch": "jest --watch"
   },
   "dependencies": {
     "@yarnpkg/builder": "^3.1.0",
+    "@yarnpkg/cli": "^3.1.0",
     "@yarnpkg/core": "^3.1.0",
     "@yarnpkg/fslib": "^2.6.0",
     "@yarnpkg/plugin-version": "^3.1.0",

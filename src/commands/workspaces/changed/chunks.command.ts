@@ -1,5 +1,6 @@
-import { CommandContext, Project } from '@yarnpkg/core';
+import { Project } from '@yarnpkg/core';
 import { Command, Option, Usage } from 'clipanion';
+import { BaseCommand } from '@yarnpkg/cli';
 import { Configuration } from '@yarnpkg/core';
 import { applyCascade, isAtLeast, isNumber, isEnum } from 'typanion';
 
@@ -8,7 +9,7 @@ import { GroupManager, groupsJsonReportConverter } from '../../../core/group-man
 import { getMapValues, getAvailableProcessesCount } from '../../../utils';
 import { ChangeDetectionStrategy } from '../../../types/configuration';
 
-export class ChunksCommand extends Command<CommandContext> {
+export class ChunksCommand extends BaseCommand {
   // Meta
   public static paths: string[][] = [['workspaces', 'changed', 'chunks']];
   public static usage: Usage = Command.Usage({
