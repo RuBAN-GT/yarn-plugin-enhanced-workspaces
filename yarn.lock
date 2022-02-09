@@ -1592,6 +1592,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@yarnpkg/plugin-enhanced-workspaces@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@yarnpkg/plugin-enhanced-workspaces@workspace:."
+  dependencies:
+    "@types/jest": ^26.0.23
+    "@types/node": ^15.12.2
+    "@typescript-eslint/eslint-plugin": ^4.33.0
+    "@typescript-eslint/parser": ^4.33.0
+    "@yarnpkg/builder": ^3.1.0
+    "@yarnpkg/cli": ^3.1.0
+    "@yarnpkg/core": ^3.1.0
+    "@yarnpkg/fslib": ^2.6.0
+    "@yarnpkg/plugin-version": ^3.1.0
+    clipanion: ^3.1.0
+    eslint: ^7.32.0
+    eslint-config-prettier: ^8.3.0
+    eslint-plugin-prettier: ^3.4.1
+    jest: ^27.3.1
+    nodemon: ^2.0.15
+    prettier: ^2.4.1
+    tree-model: ^1.0.7
+    treeify: ^1.1.0
+    ts-jest: ^27.0.7
+    ts-node: ^10.4.0
+    tslib: ^2.3.1
+    typanion: ^3.7.1
+    typescript: 4.4.4
+  languageName: unknown
+  linkType: soft
+
 "@yarnpkg/plugin-essentials@npm:^3.1.0":
   version: 3.1.0
   resolution: "@yarnpkg/plugin-essentials@npm:3.1.0"
@@ -8094,36 +8124,6 @@ resolve@^1.20.0:
   checksum: b14afbb51e3251a204d81937c86a7e9d4bdbf9a2bcee38226c900d00f522969ab675703bee2a6f99f8e20103f608382936034e64d921b74df82b63c07c5e8f59
   languageName: node
   linkType: hard
-
-"yarn-plugin-enhanced-workspaces@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "yarn-plugin-enhanced-workspaces@workspace:."
-  dependencies:
-    "@types/jest": ^26.0.23
-    "@types/node": ^15.12.2
-    "@typescript-eslint/eslint-plugin": ^4.33.0
-    "@typescript-eslint/parser": ^4.33.0
-    "@yarnpkg/builder": ^3.1.0
-    "@yarnpkg/cli": ^3.1.0
-    "@yarnpkg/core": ^3.1.0
-    "@yarnpkg/fslib": ^2.6.0
-    "@yarnpkg/plugin-version": ^3.1.0
-    clipanion: ^3.1.0
-    eslint: ^7.32.0
-    eslint-config-prettier: ^8.3.0
-    eslint-plugin-prettier: ^3.4.1
-    jest: ^27.3.1
-    nodemon: ^2.0.15
-    prettier: ^2.4.1
-    tree-model: ^1.0.7
-    treeify: ^1.1.0
-    ts-jest: ^27.0.7
-    ts-node: ^10.4.0
-    tslib: ^2.3.1
-    typanion: ^3.7.1
-    typescript: 4.4.4
-  languageName: unknown
-  linkType: soft
 
 "yn@npm:3.1.1":
   version: 3.1.1

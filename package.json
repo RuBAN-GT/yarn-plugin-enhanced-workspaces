@@ -1,5 +1,5 @@
 {
-  "name": "yarn-plugin-enhanced-workspaces",
+  "name": "@yarnpkg/plugin-enhanced-workspaces",
   "version": "0.2.1",
   "description": "Yarn plugin enhancing workspaces commands",
   "author": "Dmitry Ruban @RuBAN-GT",
