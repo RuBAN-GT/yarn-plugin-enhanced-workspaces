@@ -1,6 +1,6 @@
 {
   "name": "yarn-plugin-enhanced-workspaces",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Yarn plugin enhancing workspaces commands",
   "author": "Dmitry Ruban @RuBAN-GT",
   "license": "MIT",

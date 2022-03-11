@@ -98,7 +98,11 @@ export class ForeachCommand extends BaseCommand {
       const nodesList = groupNames.reduce((acc: string[], node) => [...acc, '--include', node], []);
 
       console.dir(`Execute '${this.args.join(' ')}' command over ${groupNames.join(', ')}`);
-      await this.cli.run([...commandList, ...nodesList, this.commandName, ...this.args]);
+
+      const exitCode = await this.cli.run([...commandList, ...nodesList, this.commandName, ...this.args]);
+      if (exitCode !== 0) {
+        throw new Error(`Exit code: ${exitCode}`);
+      }
     }
   }
 
