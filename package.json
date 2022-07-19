@@ -1,10 +1,11 @@
 {
   "name": "yarn-plugin-enhanced-workspaces",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Yarn plugin enhancing workspaces commands",
   "author": "Dmitry Ruban @RuBAN-GT",
   "license": "MIT",
   "main": "./src/index.ts",
+  "packageManager": "yarn@3.2.1",
   "publishConfig": {
     "main": "./lib/index.js",
     "typings": "./lib/index.d.ts"
@@ -24,12 +25,12 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "@yarnpkg/builder": "^3.1.0",
-    "@yarnpkg/cli": "^3.1.0",
-    "@yarnpkg/core": "^3.1.0",
-    "@yarnpkg/fslib": "^2.6.0",
-    "@yarnpkg/plugin-version": "^3.1.0",
-    "clipanion": "^3.1.0",
+    "@yarnpkg/builder": "^3.2.0",
+    "@yarnpkg/cli": "^3.2.1",
+    "@yarnpkg/core": "^3.2.1",
+    "@yarnpkg/fslib": "^2.6.2",
+    "@yarnpkg/plugin-version": "^3.1.2",
+    "clipanion": "^3.2.0-rc.4",
     "tree-model": "^1.0.7",
     "treeify": "^1.1.0",
     "tslib": "^2.3.1",
